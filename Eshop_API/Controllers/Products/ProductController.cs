@@ -86,9 +86,9 @@ namespace eshop_api.Controllers.Products
             }
         }
         [HttpGet("find-product")]
-        public async Task<ActionResult>  FindProduct([FromQuery]PagedAndSortedResultRequestDto input, string productName, int stockfirst, int stocklast, int idCategory){
+        public async Task<ActionResult>  FindProduct([FromQuery]PagedAndSortedResultRequestDto input, string productName, int stockfirst, int stocklast, int idCategory, int idProduct){
             try{
-                var result = await _productService.FindProduct(productName,stockfirst,stocklast,idCategory);
+                var result = await _productService.FindProduct(productName,stockfirst,stocklast,idCategory, idProduct);
                 result.Where(x => input.Filter == "" || input.Filter == null || x.Name == input.Filter);
                 result = PagedList<ProductDto>.ToPagedList(result.OrderBy(on => on.Name),
                         input.PageNumber,

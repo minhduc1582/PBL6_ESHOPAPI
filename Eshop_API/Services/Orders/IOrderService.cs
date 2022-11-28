@@ -21,7 +21,7 @@ namespace eshop_api.Services.Orders
         Task<bool> DeleteOrderById(int idOrder);
         Task<bool> UpdateTotal(int idOrder);
         Task<Order> AddToCart(OrderDetailDTO orderDetailDTOs, string username);
-        Task<Order> DelFromCart(int idProduct, string username);
+        Task<Order> DelFromCart(int idProduct, string username, int quantity);
         
 
     }

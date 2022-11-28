@@ -40,7 +40,7 @@ namespace eshop_api.Services.Orders
             {
                 await add.AddOrderDetail(i, order.Id);
             }
-            return result.Entity;
+            return order;
         }
 
         public async Task<OrderView> GetCart(string username)
@@ -170,7 +170,7 @@ namespace eshop_api.Services.Orders
             return false;
         }
 
-        public async Task<Order> DelFromCart(int idProduct, string username)
+        public async Task<Order> DelFromCart(int idProduct, string username, int quantity)
         {
             int userId = _context.AppUsers.FirstOrDefault(x => x.Username == username).Id;
             List<Order> order = GetOrderByStatusOfEachUser(userId, 1).ToList();
@@ -182,7 +182,18 @@ namespace eshop_api.Services.Orders
                 {
                     if(j.ProductId == idProduct)
                     {
-                        await del.DeleteOrderDetail(j.Id);
+                        int temp = j.Quantity - quantity;
+                        if (temp == 0)
+                            await del.DeleteOrderDetail(j.Id);
+                        else
+                        {
+                            CreateUpdateOrderDetail createUpdateOrderDetail = new CreateUpdateOrderDetail();
+                            createUpdateOrderDetail.idOrder = j.OrderId;
+                            createUpdateOrderDetail.ProductId = j.ProductId;
+                            createUpdateOrderDetail.Quantity = temp;
+                            createUpdateOrderDetail.Note = j.Note;
+                            await del.UpdateOrderDetail(createUpdateOrderDetail, j.Id);
+                        }
                     }
                 }
                 await UpdateTotal(i.Id);

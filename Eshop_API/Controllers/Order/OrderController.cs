@@ -95,6 +95,7 @@ namespace eshop_api.Controllers.Products
                 // var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
                 // int userId = Convert.ToInt32(claim.Value);
                 var result = await _orderService.AddOrder(orderDetailDTO, username);
+                int i = 0;
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "thêm dữ liệu thành công", result));
             }
             catch(Exception ex)
@@ -146,7 +147,7 @@ namespace eshop_api.Controllers.Products
         }
         [HttpPut("del-from-cart")]
         [Authorize(EshopPermissions.OrderPermissions.Edit)]
-        public async Task<IActionResult> DelFromCart(int idProduct)
+        public async Task<IActionResult> DelFromCart(int idProduct, int quantity)
         {
             try{
                 //var serId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -157,7 +158,7 @@ namespace eshop_api.Controllers.Products
                 // var claimsIdentity = (ClaimsIdentity)User.Identity;
                 // var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
                 // int userId = Convert.ToInt32(claim.Value);
-                var result = await _orderService.DelFromCart(idProduct, username);
+                var result = await _orderService.DelFromCart(idProduct, username, quantity);
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "xóa dữ liệu thành công", result));
             }
             catch(Exception ex)
