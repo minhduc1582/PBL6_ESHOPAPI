@@ -74,7 +74,7 @@ namespace eshop_api.Controllers.Products
         [HttpGet("get-list-product-by-name")]
         public async Task<ActionResult>  GetListProductByName([FromQuery]PagedAndSortedResultRequestDto input, string productName){
             try{
-                var result = await _productService.GetListProduct(1);
+                var result = await _productService.GetProductsByName(productName);
                 // result = result.Where(x => input.Filter == "" || input.Filter == null || x.Name.Contains(input.Filter)).ToList();
                 // var paging_result = PagedList<ProductDto>.ToPagedList(result.OrderBy(on => on.Name),
                 //         input.PageNumber,
