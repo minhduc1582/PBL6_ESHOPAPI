@@ -83,7 +83,7 @@ namespace eshop_api.Controllers.Products
         }
         [HttpPost("add-order")]
         [Authorize(EshopPermissions.OrderPermissions.Add)]
-        public async Task<IActionResult> AddOrder(List<OrderDetailDTO> orderDetailDTO)
+        public async Task<IActionResult> AddOrder(List<OrderDetailDTO> orderDetailDTO, int idAddress, int payment, int time)
         {
             try{
                 //var serId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -94,7 +94,7 @@ namespace eshop_api.Controllers.Products
                 // var claimsIdentity = (ClaimsIdentity)User.Identity;
                 // var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
                 // int userId = Convert.ToInt32(claim.Value);
-                var result = await _orderService.AddOrder(orderDetailDTO, username);
+                var result = await _orderService.AddOrder(orderDetailDTO, username, idAddress, payment, time);
                 int i = 0;
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "thêm dữ liệu thành công", result));
             }

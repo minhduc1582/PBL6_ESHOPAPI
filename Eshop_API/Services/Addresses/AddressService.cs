@@ -50,7 +50,7 @@ namespace eshop_pbl6.Services.Addresses
             return addresses;
         }
 
-        public List<CreateUpdateAddress> GetAddressById(int idAddress)
+        public async Task<List<CreateUpdateAddress>> GetAddressById(int idAddress)
         {
             var address = _context.Addresses.FirstOrDefault(x => x.Id == idAddress);
             List<CreateUpdateAddress> addresses = new List<CreateUpdateAddress>();
@@ -63,7 +63,7 @@ namespace eshop_pbl6.Services.Addresses
                 address = address.address,
                 IsDefault = address.IsDefault
             });
-            return addresses;
+            return await Task.FromResult(addresses);
         }
 
         public async Task<Address> AddAddress(CreateUpdateAddress createUpdateAddress, string username)
