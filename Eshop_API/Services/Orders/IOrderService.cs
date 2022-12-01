@@ -15,13 +15,13 @@ namespace eshop_api.Services.Orders
         List<Order> GetOrdersByUserId(int userId);
         List<Order> GetOrdersByStatus(int status);
         List <Order> GetOrderByStatusOfEachUser(int userId, int status);
-        Task<Order> AddOrder(List<OrderDetailDTO> orderDetailDTOs, string username);
+        Task<Order> AddOrder(List<OrderDetailDTO> orderDetailDTOs, string username, int idAddress, int payment, int time);
         Task<Order> UpdateOrder(CreateUpdateOrder createUpdateOrder, int idOrder);
         Task<Order> ChangeStatus(int idOrder, int status);
         Task<bool> DeleteOrderById(int idOrder);
         Task<bool> UpdateTotal(int idOrder);
         Task<Order> AddToCart(OrderDetailDTO orderDetailDTOs, string username);
-        Task<Order> DelFromCart(int idProduct, string username);
+        Task<Order> DelFromCart(int idProduct, string username, int quantity);
         
 
     }

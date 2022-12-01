@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using eshop_api.Entities;
+using Eshop_API.Entities;
+using Eshop_API.Models.DTO.Adress;
 
 namespace eshop_api.Models.DTO.Order
 {
@@ -18,5 +20,8 @@ namespace eshop_api.Models.DTO.Order
         public string CheckedComment { get; set; }
         public int UserId { get; set; }
         public List<OrderDetailDTOs> list {get; set;}
+        public List<CreateUpdateAddress> address { get; set; }
+        public string Payment { get; set; }
+        public string Time { get; set; }
     }
 }

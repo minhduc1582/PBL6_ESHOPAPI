@@ -9,6 +9,9 @@ using eshop_api.Services.Images;
 using eshop_pbl6.Helpers.Order;
 using Microsoft.AspNetCore.Identity;
 using eshop_pbl6.Models.DTO.Identities;
+using eshop_pbl6.Services.Addresses;
+using Eshop_API.Models.DTO.Adress;
+
 namespace eshop_api.Services.Orders
 {
     public class OderService : IOrderService
@@ -19,7 +22,7 @@ namespace eshop_api.Services.Orders
             _context = context;
         }
         
-        public async Task<Order> AddOrder(List<OrderDetailDTO> orderDetailDTOs, string username)
+        public async Task<Order> AddOrder(List<OrderDetailDTO> orderDetailDTOs, string username, int idAddress, int payment, int time)
         {
             int userId = _context.AppUsers.FirstOrDefault(x => x.Username == username).Id;
             double temp = 0;
@@ -33,6 +36,9 @@ namespace eshop_api.Services.Orders
             order.Status = Status.Pending.ToString();
             order.Total = temp;
             order.UserId = userId;
+            order.AddressId = idAddress;
+            order.PaymentMethod = payment;
+            order.DeliveryTime = time;
             CreateUpdateOrderDetail orderDetail = new CreateUpdateOrderDetail();
             var result = await _context.Orders.AddAsync(order);
             await _context.SaveChangesAsync();
@@ -40,7 +46,7 @@ namespace eshop_api.Services.Orders
             {
                 await add.AddOrderDetail(i, order.Id);
             }
-            return result.Entity;
+            return order;
         }
 
         public async Task<OrderView> GetCart(string username)
@@ -170,7 +176,7 @@ namespace eshop_api.Services.Orders
             return false;
         }
 
-        public async Task<Order> DelFromCart(int idProduct, string username)
+        public async Task<Order> DelFromCart(int idProduct, string username, int quantity)
         {
             int userId = _context.AppUsers.FirstOrDefault(x => x.Username == username).Id;
             List<Order> order = GetOrderByStatusOfEachUser(userId, 1).ToList();
@@ -182,7 +188,18 @@ namespace eshop_api.Services.Orders
                 {
                     if(j.ProductId == idProduct)
                     {
-                        await del.DeleteOrderDetail(j.Id);
+                        int temp = j.Quantity - quantity;
+                        if (temp == 0)
+                            await del.DeleteOrderDetail(j.Id);
+                        else
+                        {
+                            CreateUpdateOrderDetail createUpdateOrderDetail = new CreateUpdateOrderDetail();
+                            createUpdateOrderDetail.idOrder = j.OrderId;
+                            createUpdateOrderDetail.ProductId = j.ProductId;
+                            createUpdateOrderDetail.Quantity = temp;
+                            createUpdateOrderDetail.Note = j.Note;
+                            await del.UpdateOrderDetail(createUpdateOrderDetail, j.Id);
+                        }
                     }
                 }
                 await UpdateTotal(i.Id);
@@ -201,11 +218,19 @@ namespace eshop_api.Services.Orders
         public async Task<List<OrderView>> GetOrderById(int idOrder)
         {
             OderDetailService get = new OderDetailService(_context);
+            AddressService get_address = new AddressService(_context);
+            string payment = "";
+            string time = "";
             var order = _context.Orders.FirstOrDefault(x => x.Id == idOrder);
             List<OrderView> list = new List<OrderView>();
             if(order!=null)
             {
                 List<OrderDetailDTOs> details = await get.GetOrderDetailByOrderId(idOrder);
+                List<CreateUpdateAddress> address = await get_address.GetAddressById(order.AddressId);
+                if (order.PaymentMethod == 1) payment = "Banking";
+                else payment = "COD";
+                if (order.DeliveryTime == 1) time = "Anytime";
+                else time = "Office hours only";
                     list.Add(new OrderView(){
                         Id = order.Id,
                         Status = order.Status,
@@ -216,7 +241,10 @@ namespace eshop_api.Services.Orders
                         CheckedBy = order.CheckedBy,
                         CheckedComment = order.CheckedComment,
                         UserId = order.UserId,
-                        list = details
+                        list = details,
+                        address = address,
+                        Time = time,
+                        Payment = payment
                     });
                 return await Task.FromResult(list);
             }

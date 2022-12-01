@@ -17,6 +17,7 @@ using System.Text.Json.Serialization;
 using eshop_pbl6.Services.Hub;
 using Serilog;
 using System.Reflection;
+using eshop_pbl6.Services.Addresses;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -102,7 +103,13 @@ services.AddScoped<IUserService, UserService>();
 services.AddScoped<IJwtUtils, JwtUtils>();
 services.AddTransient<IOrderService, OderService>();
 services.AddTransient<IOderDetailService, OderDetailService>();
-
+services.AddTransient<IAddressService, AddressService>();
+services.AddControllers()
+           .AddJsonOptions(options =>
+           {
+               options.JsonSerializerOptions.WriteIndented = true;
+               options.JsonSerializerOptions.Converters.Add(new CustomJsonConverterForType());
+           });
 
 services.AddCors(o =>
                 o.AddPolicy("CorsPolicy", policy =>

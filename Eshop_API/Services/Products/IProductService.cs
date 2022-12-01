@@ -13,7 +13,7 @@ namespace eshop_api.Service.Products
         Task<List<ProductDto>> GetProductsByIdCategory(int idCategory, int sortOrder);
         Task<List<ProductDto>> GetProductsById(int idProduct);
         Task<List<ProductDto>> GetProductsByName(string productName);
-        Task<List<ProductDto>> FindProduct(string productName, int stockfirst, int stocklast, int idCategory);
+        Task<List<ProductDto>> FindProduct(string productName, int stockfirst, int stocklast, int idCategory, int idProduct);
         Task<ProductDto> AddProduct(CreateUpdateProductDto createProductDto);
         Task<Product> UpdateProduct(CreateUpdateProductDto createProductDto, int IdProduct);
         Task<bool> DeleteProductById(int id);

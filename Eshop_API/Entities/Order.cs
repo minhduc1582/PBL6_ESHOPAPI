@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Eshop_API.Entities;
+
 namespace eshop_api.Entities
 {
     public class Order
@@ -19,6 +21,11 @@ namespace eshop_api.Entities
         public string CheckedComment { get; set; }
         [ForeignKey("User")]
         public int UserId { get; set; }
+        [ForeignKey("Address")]
+        public int AddressId { get; set; }
+        public int DeliveryTime { get; set; }
+        public int PaymentMethod { get; set; }
+        public Address Address { get; set; }
         public User User { get; set; }
     }
 }
