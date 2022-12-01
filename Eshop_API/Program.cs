@@ -17,6 +17,9 @@ using System.Text.Json.Serialization;
 using eshop_pbl6.Services.Hub;
 using Serilog;
 using System.Reflection;
+using eshop_pbl6.Services.Addresses;
+using Serilog.Events;
+using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -102,7 +105,13 @@ services.AddScoped<IUserService, UserService>();
 services.AddScoped<IJwtUtils, JwtUtils>();
 services.AddTransient<IOrderService, OderService>();
 services.AddTransient<IOderDetailService, OderDetailService>();
-
+services.AddTransient<IAddressService, AddressService>();
+services.AddControllers()
+           .AddJsonOptions(options =>
+           {
+               options.JsonSerializerOptions.WriteIndented = true;
+               options.JsonSerializerOptions.Converters.Add(new CustomJsonConverterForType());
+           });
 
 services.AddCors(o =>
                 o.AddPolicy("CorsPolicy", policy =>
@@ -110,10 +119,28 @@ services.AddCors(o =>
                         .AllowAnyHeader()
                         .AllowAnyMethod()));
 
-Log.Logger = new LoggerConfiguration()
-    .WriteTo.File("Logs/logs.log")
-    .CreateLogger();
+// Log.Logger = new LoggerConfiguration()
+//     .WriteTo.File("Logs/logs.log")
+//     .CreateLogger();
+// builder.Logging.ClearProviders();
+// builder.Logging.AddSerilog();
+            Log.Logger = new LoggerConfiguration()
+#if DEBUG
+                .MinimumLevel.Debug()
+#else
+                .MinimumLevel.Information()
+#endif
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
+                .Enrich.FromLogContext()
+                .WriteTo.Async(c => c.File("Logs/logs.log"))
+#if DEBUG
+                //.WriteTo.Async(c => c.())
+#endif
+                .CreateLogger();
+
 builder.Logging.ClearProviders();
+builder.Logging.AddEventLog();
 builder.Logging.AddSerilog();
 
 var app = builder.Build();
@@ -147,6 +174,8 @@ app.UseEndpoints(endpoints => {
     endpoints.MapHub<MessageHub>("/notification");
     endpoints.MapHub<MessageHub>("/notification");
 });
+
+app.UseHttpsRedirection();
 
 app.MapGet("/", () => "ESHOP WEB API PLEASE ACCESS http://localhost:23016/swagger/index.html");
 
