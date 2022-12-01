@@ -1,4 +1,5 @@
-﻿using eshop_api.Models.DTO.Order;
+﻿using eshop_api.Controllers;
+using eshop_api.Models.DTO.Order;
 using Eshop_API.Models.DTO.Adress;
 using eshop_pbl6.Helpers.Common;
 using eshop_pbl6.Services.Addresses;
@@ -10,7 +11,7 @@ using System.Text.Json.Serialization;
 
 namespace Eshop_API.Controllers.Address
 {
-    public class AddressController : Controller
+    public class AddressController : BaseController
     {
         private readonly IAddressService _addressService;
 

@@ -133,9 +133,9 @@ services.AddCors(o =>
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                 .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
-                .WriteTo.Async(c => c.File("Logs/logs.txt"))
+                .WriteTo.Async(c => c.File("Logs/logs.log"))
 #if DEBUG
-                //.WriteTo.Async(c => c.Console())
+                //.WriteTo.Async(c => c.())
 #endif
                 .CreateLogger();
 
