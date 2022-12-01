@@ -124,27 +124,23 @@ services.AddCors(o =>
 //     .CreateLogger();
 // builder.Logging.ClearProviders();
 // builder.Logging.AddSerilog();
-            Log.Logger = new LoggerConfiguration()
-#if DEBUG
-                .MinimumLevel.Debug()
-#else
-                .MinimumLevel.Information()
-#endif
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-                .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
-                .Enrich.FromLogContext()
-                .WriteTo.Async(c => c.File("Logs/logs.log"))
-#if DEBUG
-                //.WriteTo.Async(c => c.())
-#endif
-                .CreateLogger();
-
-builder.Logging.ClearProviders();
-builder.Logging.AddEventLog();
-builder.Logging.AddSerilog();
 
 var app = builder.Build();
 
+// if (app.Environment.IsDevelopment())
+// {
+//             Log.Logger = new LoggerConfiguration()
+//                 .MinimumLevel.Information()
+//                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+//                 .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
+//                 .Enrich.FromLogContext()
+//                 .WriteTo.Async(c => c.File("Logs/logs.log"))
+//                 .CreateLogger();
+
+//             builder.Logging.ClearProviders();
+//             builder.Logging.AddEventLog();
+//             builder.Logging.AddSerilog();
+// }
 
 // var loggerFactory = app.Services.GetService<ILoggerFactory>();
 // loggerFactory.AddFile(builder.Configuration["Logging:LogFilePath"].ToString()); 
@@ -175,13 +171,13 @@ app.UseEndpoints(endpoints => {
     endpoints.MapHub<MessageHub>("/notification");
 });
 
+
 app.UseHttpsRedirection();
 
 app.MapGet("/", () => "ESHOP WEB API PLEASE ACCESS http://localhost:23016/swagger/index.html");
 
-app.UseAuthentication();
-
 app.UseAuthorization();
+// app.UseAuthentication();
 
 app.MapControllers();
 
