@@ -34,10 +34,10 @@ namespace eshop_api.Controllers.Products
             try{
                 var result = await _productService.GetListProduct(sortOrder);
                 result.Where(x => input.Filter == "" || input.Filter == null || x.Name == input.Filter);
-                result = PagedList<ProductDto>.ToPagedList(result,
+                var page_list =  PagedList<ProductDto>.ToPagedList(result,
                         input.PageNumber,
                         input.PageSize);
-                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,"get dữ liệu thành công",result) );
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,"get dữ liệu thành công",page_list) );
             }
             catch(Exception ex){
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,ex.Message,"null") );
@@ -48,10 +48,10 @@ namespace eshop_api.Controllers.Products
             try{
                 var result = await _productService.GetProductsByIdCategory(idCategory, sortOrder);
                 result.Where(x => input.Filter == "" || input.Filter == null || x.Name == input.Filter);
-                result = PagedList<ProductDto>.ToPagedList(result.OrderBy(on => on.Name),
+                var page_list  = PagedList<ProductDto>.ToPagedList(result.OrderBy(on => on.Name),
                         input.PageNumber,
                         input.PageSize);
-                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,"get dữ liệu thành công",result) );
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,"get dữ liệu thành công",page_list) );
             }
             catch(Exception ex){
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,ex.Message,"null") );
@@ -62,17 +62,17 @@ namespace eshop_api.Controllers.Products
             try{
                 var result = await _productService.GetProductsById(idProduct);
                 result.Where(x => input.Filter == "" || input.Filter == null || x.Name == input.Filter);
-                result = PagedList<ProductDto>.ToPagedList(result.OrderBy(on => on.Name),
+                var page_list  = PagedList<ProductDto>.ToPagedList(result.OrderBy(on => on.Name),
                         input.PageNumber,
                         input.PageSize);
-                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,"get dữ liệu thành công",result) );
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,"get dữ liệu thành công",page_list) );
             }
             catch(Exception ex){
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,ex.Message,"null") );
             }
         }
         [HttpGet("get-list-product-by-name")]
-        public async Task<ActionResult>  GetListProductByName([FromQuery]PagedAndSortedResultRequestDto input, string productName){
+        public async Task<ActionResult>  GetListProductByName([FromQuery]PagedAndSortedResultRequestDto input, string productName,int sortOrder){
             try{
                 var result = await _productService.GetProductsByName(productName);
                 // result = result.Where(x => input.Filter == "" || input.Filter == null || x.Name.Contains(input.Filter)).ToList();
@@ -90,10 +90,10 @@ namespace eshop_api.Controllers.Products
             try{
                 var result = await _productService.FindProduct(productName,stockfirst,stocklast,idCategory, idProduct);
                 result.Where(x => input.Filter == "" || input.Filter == null || x.Name == input.Filter);
-                result = PagedList<ProductDto>.ToPagedList(result.OrderBy(on => on.Name),
+                var page_list = PagedList<ProductDto>.ToPagedList(result.OrderBy(on => on.Name),
                         input.PageNumber,
                         input.PageSize);
-                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,"get dữ liệu thành công",result) );
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,"get dữ liệu thành công",page_list) );
             }
             catch(Exception ex){
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,ex.Message,"null") );
