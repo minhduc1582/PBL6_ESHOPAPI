@@ -13,5 +13,6 @@ namespace Eshop_API.Models.DTO.VNPAY
             set{_amount = value*100;}
         }
         public string Content{get;set;}
+        public string Email{get;set;}
     }
 }

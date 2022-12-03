@@ -11,7 +11,7 @@ namespace eshop_api.Entities
         [Key]
         public int Id{get;set;}
         [ForeignKey("Order")]
-        public int OrderId{get;set;}
+        public string OrderId{get;set;}
         [ForeignKey("Product")]
         public int ProductId{get;set;}
         public int Quantity{get;set;}

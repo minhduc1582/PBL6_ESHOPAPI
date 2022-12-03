@@ -138,7 +138,7 @@ namespace eshop_api.Services.Orders
             return results.Entity;
         }
 
-        public async Task<Order> ChangeStatus(int idOrder, int status)
+        public async Task<Order> ChangeStatus(string idOrder, int status)
         {
             var order = _context.Orders.FirstOrDefault(x=> x.Id == idOrder);
             switch(status)
@@ -167,7 +167,7 @@ namespace eshop_api.Services.Orders
             return result.Entity;
         }
 
-        public async Task<bool> DeleteOrderById(int idOrder)
+        public async Task<bool> DeleteOrderById(string idOrder)
         {
             var order = _context.Orders.FirstOrDefault(x => x.Id == idOrder);
             if(order != null)
@@ -217,7 +217,7 @@ namespace eshop_api.Services.Orders
             return _context.Orders.ToList();
         }
 
-        public async Task<List<OrderView>> GetOrderById(int idOrder)
+        public async Task<List<OrderView>> GetOrderById(string idOrder)
         {
             string payment = "";
             string time = "";
@@ -323,7 +323,7 @@ namespace eshop_api.Services.Orders
             throw null;
         }
 
-        public async Task<Order> UpdateOrder(CreateUpdateOrder createUpdateOrder, int idOrder)
+        public async Task<Order> UpdateOrder(CreateUpdateOrder createUpdateOrder, string idOrder)
         {
             var order = _context.Orders.FirstOrDefault(x => x.Id == idOrder);
             if(order != null)
@@ -367,7 +367,7 @@ namespace eshop_api.Services.Orders
             }
         }
 
-        public async Task<bool> UpdateTotal(int idOrder)
+        public async Task<bool> UpdateTotal(string idOrder)
         {
             double temp = 0;
             var order = _context.Orders.FirstOrDefault(x=> x.Id == idOrder);

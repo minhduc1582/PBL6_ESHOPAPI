@@ -10,7 +10,7 @@ namespace eshop_api.Models.DTO.Order
 {
     public class OrderView
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
         public string Status { get; set; }
         public double Total { get; set; }
         public string Note { get; set; }
