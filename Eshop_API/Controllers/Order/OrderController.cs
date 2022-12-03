@@ -46,7 +46,7 @@ namespace eshop_api.Controllers.Products
             }
         }
         [HttpGet("get-order-by-id")]
-        public IActionResult GetOrderById(int idOrder)
+        public IActionResult GetOrderById(string idOrder)
         {
             try{
                 var result = _orderService.GetOrderById(idOrder);
@@ -167,7 +167,7 @@ namespace eshop_api.Controllers.Products
             }
         }
         [HttpPut("change-status")]
-        public async Task<IActionResult> ChangeStatus(int idOrder, int status)
+        public async Task<IActionResult> ChangeStatus(string idOrder, int status)
         {
             try{
                 var result = await _orderService.ChangeStatus(idOrder, status);
@@ -179,7 +179,7 @@ namespace eshop_api.Controllers.Products
             }
         }
         [HttpPut("update-order")]
-        public async Task<IActionResult> UpdateOrder(CreateUpdateOrder createUpdateOrder, int idOrder)
+        public async Task<IActionResult> UpdateOrder(CreateUpdateOrder createUpdateOrder, string idOrder)
         {
             try{
                 var result = await _orderService.UpdateOrder(createUpdateOrder, idOrder);
@@ -191,7 +191,7 @@ namespace eshop_api.Controllers.Products
             }
         }
         [HttpDelete("delete-order")]
-        public async Task<IActionResult> DeleteOrder(int idOrder)
+        public async Task<IActionResult> DeleteOrder(string idOrder)
         {
             try{
                 var result = await _orderService.DeleteOrderById(idOrder);
