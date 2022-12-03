@@ -9,10 +9,10 @@ namespace eshop_api.Services.Orders
     public interface IOderDetailService
     {
         List<OrderDetail> GetOrderDetailsById(int idOrderDetail);
-        List<OrderDetail> GetOrderDetailsByOrderId(int idOrder);
-        Task<List<OrderDetailDTOs>> GetOrderDetailByOrderId(int idOrder);
+        List<OrderDetail> GetOrderDetailsByOrderId(string idOrder);
+        Task<List<OrderDetailDTOs>> GetOrderDetailByOrderId(string idOrder);
         Task<OrderDetail> AddOrderDetail(CreateUpdateOrderDetail createUpdateOrderDetail);
-        Task<OrderDetail> AddOrderDetail(OrderDetailDTO orderDetailDTO, int idOrder);
+        Task<OrderDetail> AddOrderDetail(OrderDetailDTO orderDetailDTO, string idOrder);
         Task<OrderDetail> UpdateOrderDetail(CreateUpdateOrderDetail createUpdateOrderDetail, int idOrderDetail);
         Task<bool> DeleteOrderDetail (int idOrderDetail);
     }
