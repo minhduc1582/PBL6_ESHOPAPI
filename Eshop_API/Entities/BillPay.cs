@@ -16,7 +16,6 @@ namespace Eshop_API.Entities
         public string Amount{get;set;}
         public string PayDate{get;set;}
         public string OrderInfo{get;set;}
-        public int IdOrder{get;set;}
         public string BankCode{get;set;}
         public int Status{get;set;} // watting,
     }

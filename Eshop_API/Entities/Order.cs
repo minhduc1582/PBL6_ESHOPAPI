@@ -11,7 +11,7 @@ namespace eshop_api.Entities
     public class Order
     {
         [Key]
-        public int Id { get; set; }
+        public string Id { get; set; } =  DateTime.Now.Ticks.ToString();// TNXREF
         public string Status { get; set; }
         public double Total { get; set; }
         public string Note { get; set; }
