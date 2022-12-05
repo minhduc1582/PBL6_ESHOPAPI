@@ -15,5 +15,8 @@ namespace Eshop_API.Repositories.VnPays
         {
             _context = context;
         }
+        public async Task SaveChangesAsync(){
+            await _context.SaveChangesAsync();
+        }
     }
 }

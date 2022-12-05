@@ -18,7 +18,7 @@ namespace Eshop_API.Controllers.VNPAY
         public async Task<IActionResult> ResolvePayMent(){
             var queryString = System.Web.HttpUtility.ParseQueryString(HttpContext.Request.QueryString.Value);
             if(queryString.Count > 0){
-                var result =  _paymentService.ChecksumReponse(queryString);
+                var result = await _paymentService.ChecksumReponse(queryString);
                 return Ok(result);
             }
             else{

@@ -15,5 +15,6 @@ namespace Eshop_API.Models.DTO.VNPAY
         public string Content{get;set;}
         public string Email{get;set;}
         public string Name{get;set;}
+        public Guid Tnx_Ref{get;set;}
     }
 }
