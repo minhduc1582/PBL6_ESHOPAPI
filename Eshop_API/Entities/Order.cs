@@ -22,7 +22,7 @@ namespace eshop_api.Entities
         [ForeignKey("User")]
         public int UserId { get; set; }
         [ForeignKey("Address")]
-        public int AddressId { get; set; }
+        public int? AddressId { get; set; }
         public int DeliveryTime { get; set; }
         public int PaymentMethod { get; set; }
         public Address Address { get; set; }
