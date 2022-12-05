@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using eshop_api.Entities;
+using Eshop_API.Entities;
 using eshop_pbl6.Entities;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -31,6 +32,7 @@ namespace eshop_api.Helpers
             });
         }
         public DbSet<User> AppUsers {get; set;}
+        public DbSet<Address> Addresses { get; set; }
         public DbSet<Comunity> Comunities{get;set;} 
         public DbSet<District> Dictricts  {get;set;}  
         public DbSet<Province> Provinces {get;set;}
@@ -44,5 +46,6 @@ namespace eshop_api.Helpers
         public DbSet<Comment> Comments{get;set;}
         public DbSet<Image> Images{get;set;}
         public DbSet<History> Histories{get;set;}
+        public DbSet<BillPay> BillPays{get;set;}
     }
 }

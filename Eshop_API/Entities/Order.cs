@@ -4,12 +4,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Eshop_API.Entities;
+using Eshop_API.Helpers.Order;
+using System.Text.Json.Serialization;
+
 namespace eshop_api.Entities
 {
     public class Order
     {
         [Key]
-        public int Id { get; set; }
+        #nullable disable
+        public Guid Id { get; set; } =  Guid.NewGuid();// TNXREF
         public string Status { get; set; }
         public double Total { get; set; }
         public string Note { get; set; }
@@ -19,6 +24,15 @@ namespace eshop_api.Entities
         public string CheckedComment { get; set; }
         [ForeignKey("User")]
         public int UserId { get; set; }
-        public User User { get; set; }
+        [ForeignKey("Address")]
+        public int? AddressId { get; set; }
+        public int DeliveryTime { get; set; }
+        public PaymentMethod PaymentMethod { get; set; }
+        [JsonIgnore]
+        public virtual Address Address { get; set; }
+        [JsonIgnore]
+        public virtual User User { get; set; }
+        [JsonIgnore]
+        public virtual BillPay BillPay{get;set;}
     }
 }

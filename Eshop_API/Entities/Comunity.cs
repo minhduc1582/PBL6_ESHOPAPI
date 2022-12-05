@@ -14,6 +14,6 @@ namespace eshop_api.Entities
         public string Name{get;set;}
         [ForeignKey("District")]
         public int DistrictId{get;set;}
-        public District District{get;set;}
+        public virtual District District{get;set;}
     }
 }

@@ -175,14 +175,18 @@ namespace eshop_api.Service.Products
             throw null;
         }
 
-        public async Task<List<ProductDto>> FindProduct(string productName, int stockfirst, int stocklast, int idCategory)
+        public async Task<List<ProductDto>> FindProduct(string productName, int stockfirst, int stocklast, int idCategory, int idProduct)
         {
             var products = _context.Products.ToList();
             if(idCategory != 0)
             {
                 products = products.Where(x => x.CategoryId == idCategory).ToList();
             }
-            if(stockfirst != 0)
+            if (idProduct != 0)
+            {
+                products = products.Where(x => x.Id == idProduct).ToList();
+            }
+            if (stockfirst != 0)
             {
                 products = products.Where(x => x.ImportQuantity >= stockfirst).ToList();
             }

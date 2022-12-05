@@ -30,7 +30,7 @@ namespace eshop_api.Controllers.Order
             }
         }
         [HttpGet("get-order-detail-by-order-id")]
-        public IActionResult GetOrderDetailsByOrderId(int idOrder)
+        public IActionResult GetOrderDetailsByOrderId(Guid idOrder)
         {
             try{
                 var result = _orderDetailService.GetOrderDetailsByOrderId(idOrder);

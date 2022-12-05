@@ -17,6 +17,13 @@ using System.Text.Json.Serialization;
 using eshop_pbl6.Services.Hub;
 using Serilog;
 using System.Reflection;
+using eshop_pbl6.Services.Addresses;
+using Serilog.Events;
+using Microsoft.Extensions.Logging;
+using Eshop_API.Repositories.Generics;
+using Eshop_API.Repositories.Orders;
+using Eshop_API.Services.VNPAY;
+using Eshop_API.Repositories.VnPays;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -94,6 +101,7 @@ services.AddDbContext<DataContext>(
 //     });
 
 // Add Depedency
+#region Services
 services.AddScoped<ITokenService, TokenService>();
 services.AddScoped<IProductService, ProductService>();
 services.AddScoped<ICategoryService, CategoryService>();
@@ -102,7 +110,21 @@ services.AddScoped<IUserService, UserService>();
 services.AddScoped<IJwtUtils, JwtUtils>();
 services.AddTransient<IOrderService, OderService>();
 services.AddTransient<IOderDetailService, OderDetailService>();
+services.AddTransient<IAddressService, AddressService>();
+services.AddTransient<IVnPayService, VnPayService>();
+#endregion
 
+#region Repositories
+services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+services.AddTransient<IOrderRepository, OrderRepository>();
+services.AddTransient<IBillPaymentRepository, BillPaymentRepository>();
+#endregion
+services.AddControllers()
+           .AddJsonOptions(options =>
+           {
+               options.JsonSerializerOptions.WriteIndented = true;
+               options.JsonSerializerOptions.Converters.Add(new CustomJsonConverterForType());
+           });
 
 services.AddCors(o =>
                 o.AddPolicy("CorsPolicy", policy =>
@@ -110,14 +132,28 @@ services.AddCors(o =>
                         .AllowAnyHeader()
                         .AllowAnyMethod()));
 
-Log.Logger = new LoggerConfiguration()
-    .WriteTo.File("Logs/logs.log")
-    .CreateLogger();
-builder.Logging.ClearProviders();
-builder.Logging.AddSerilog();
+// Log.Logger = new LoggerConfiguration()
+//     .WriteTo.File("Logs/logs.log")
+//     .CreateLogger();
+// builder.Logging.ClearProviders();
+// builder.Logging.AddSerilog();
 
 var app = builder.Build();
 
+// if (app.Environment.IsDevelopment())
+// {
+//             Log.Logger = new LoggerConfiguration()
+//                 .MinimumLevel.Information()
+//                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+//                 .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
+//                 .Enrich.FromLogContext()
+//                 .WriteTo.Async(c => c.File("Logs/logs.log"))
+//                 .CreateLogger();
+
+//             builder.Logging.ClearProviders();
+//             builder.Logging.AddEventLog();
+//             builder.Logging.AddSerilog();
+// }
 
 // var loggerFactory = app.Services.GetService<ILoggerFactory>();
 // loggerFactory.AddFile(builder.Configuration["Logging:LogFilePath"].ToString()); 
@@ -148,11 +184,13 @@ app.UseEndpoints(endpoints => {
     endpoints.MapHub<MessageHub>("/notification");
 });
 
+
+app.UseHttpsRedirection();
+
 app.MapGet("/", () => "ESHOP WEB API PLEASE ACCESS http://localhost:23016/swagger/index.html");
 
-app.UseAuthentication();
-
 app.UseAuthorization();
+// app.UseAuthentication();
 
 app.MapControllers();
 
