@@ -46,5 +46,6 @@ namespace eshop_api.Helpers
         public DbSet<Comment> Comments{get;set;}
         public DbSet<Image> Images{get;set;}
         public DbSet<History> Histories{get;set;}
+        public DbSet<BillPay> BillPays{get;set;}
     }
 }

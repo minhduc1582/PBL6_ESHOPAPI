@@ -20,6 +20,8 @@ using System.Reflection;
 using eshop_pbl6.Services.Addresses;
 using Serilog.Events;
 using Microsoft.Extensions.Logging;
+using Eshop_API.Repositories.Generics;
+using Eshop_API.Repositories.Orders;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -97,6 +99,7 @@ services.AddDbContext<DataContext>(
 //     });
 
 // Add Depedency
+#region Services
 services.AddScoped<ITokenService, TokenService>();
 services.AddScoped<IProductService, ProductService>();
 services.AddScoped<ICategoryService, CategoryService>();
@@ -106,6 +109,12 @@ services.AddScoped<IJwtUtils, JwtUtils>();
 services.AddTransient<IOrderService, OderService>();
 services.AddTransient<IOderDetailService, OderDetailService>();
 services.AddTransient<IAddressService, AddressService>();
+#endregion
+
+#region Repositories
+services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+services.AddTransient<IOrderRepository, OrderRepository>();
+#endregion
 services.AddControllers()
            .AddJsonOptions(options =>
            {
