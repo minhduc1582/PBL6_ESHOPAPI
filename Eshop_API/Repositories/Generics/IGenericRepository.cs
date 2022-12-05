@@ -11,6 +11,7 @@ namespace Eshop_API.Repositories.Generics
         Task<T> GetById(int id);
         Task<List<T>> GetAll();
         Task<List<T>> Find(Expression<Func<T, bool>> expression);
+        Task<T> FirstOrDefault(Expression<Func<T, bool>> expression);
         Task<T> Add(T entity);
         Task AddRange(IEnumerable<T> entities);
         Task Remove(T entity);

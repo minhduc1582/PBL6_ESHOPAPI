@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using eshop_api.Helpers;
 
@@ -10,9 +11,10 @@ using eshop_api.Helpers;
 namespace eshop_api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20221205055502_addforeinkey")]
+    partial class addforeinkey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -529,8 +531,8 @@ namespace eshop_api.Migrations
             modelBuilder.Entity("eshop_api.Entities.BillPay", b =>
                 {
                     b.HasOne("eshop_api.Entities.Order", "Order")
-                        .WithOne("BillPay")
-                        .HasForeignKey("eshop_api.Entities.BillPay", "TnxRef")
+                        .WithMany()
+                        .HasForeignKey("TnxRef")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -683,11 +685,6 @@ namespace eshop_api.Migrations
             modelBuilder.Entity("eshop_api.Entities.District", b =>
                 {
                     b.Navigation("Comunities");
-                });
-
-            modelBuilder.Entity("eshop_api.Entities.Order", b =>
-                {
-                    b.Navigation("BillPay");
                 });
 
             modelBuilder.Entity("eshop_api.Entities.Product", b =>

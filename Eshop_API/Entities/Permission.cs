@@ -14,6 +14,6 @@ namespace eshop_pbl6.Entities
         public int Id { get; set; }
         public string name { get; set; }
         [JsonIgnore]
-        public List<RoleInPermission> RoleInPermissions{get;set;}
+        public virtual List<RoleInPermission> RoleInPermissions{get;set;}
     }
 }

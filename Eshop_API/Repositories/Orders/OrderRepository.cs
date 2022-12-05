@@ -16,7 +16,7 @@ namespace Eshop_API.Repositories.Orders
             _context = context;
         }
 
-        public async Task<bool> UpdateTotal(int idOrder){
+        public async Task<bool> UpdateTotal(Guid idOrder){
              double temp = 0;
             var order = _context.Orders.FirstOrDefault(x=> x.Id == idOrder);
             if(order == null) return false;

@@ -11,6 +11,10 @@ using Microsoft.AspNetCore.Identity;
 using eshop_pbl6.Models.DTO.Identities;
 using eshop_pbl6.Services.Addresses;
 using Eshop_API.Models.DTO.Adress;
+using Eshop_API.Helpers.Order;
+using Newtonsoft.Json;
+using Eshop_API.Services.VNPAY;
+using Eshop_API.Models.DTO.VNPAY;
 
 namespace eshop_api.Services.Orders
 {
@@ -19,18 +23,21 @@ namespace eshop_api.Services.Orders
         private readonly DataContext _context;
         private readonly IOderDetailService _orderDetailService;
         private readonly IAddressService _addressService;
+        private readonly IVnPayService _vnPayService;
         public OderService(DataContext context,
                             IOderDetailService orderDetailService,
-                            IAddressService addressService)
+                            IAddressService addressService,
+                            IVnPayService vnPayService)
         {
             _context = context;
             _orderDetailService = orderDetailService;
             _addressService = addressService;
+            _vnPayService = vnPayService;
         }
         
-        public async Task<Order> AddOrder(List<OrderDetailDTO> orderDetailDTOs, string username, int idAddress, int payment, int time)
+        public async Task<OrderDto> AddOrder(List<OrderDetailDTO> orderDetailDTOs, string username, int idAddress, PaymentMethod payment, int time,string ipaddr)
         {
-            int userId = _context.AppUsers.FirstOrDefault(x => x.Username == username).Id;
+            var user = _context.AppUsers.FirstOrDefault(x => x.Username == username);
             double temp = 0;
             foreach(OrderDetailDTO i in orderDetailDTOs)
             {
@@ -40,18 +47,32 @@ namespace eshop_api.Services.Orders
             Order order = new Order();
             order.Status = Status.Pending.ToString();
             order.Total = temp;
-            order.UserId = userId;
+            order.UserId = user.Id;
             order.AddressId = idAddress;
             order.PaymentMethod = payment;
             order.DeliveryTime = time;
             CreateUpdateOrderDetail orderDetail = new CreateUpdateOrderDetail();
-            var result = await _context.Orders.AddAsync(order);
+            var result = (await _context.Orders.AddAsync(order)).Entity;
             await _context.SaveChangesAsync();
             foreach(OrderDetailDTO i in orderDetailDTOs)
             {
                 await _orderDetailService.AddOrderDetail(i, order.Id);
             }
-            return order;
+            result.User = null;
+            var jsonOrder = JsonConvert.SerializeObject(result);
+            var orderDto = JsonConvert.DeserializeObject<OrderDto>(jsonOrder);
+            if(payment == PaymentMethod.Online){
+                ModelPayDto modalPayDto = new ModelPayDto{
+                    Amount = result.Total,
+                    Email = user.Email,
+                    Name = user.FirstName + user.LastName,
+                    Content = "Thanh toan don hang " + result.Id,
+                    Tnx_Ref = result.Id
+                };
+                orderDto.PaymentURL = await _vnPayService.CreateRequestUrl(modalPayDto,ipaddr);
+                return orderDto;
+            }
+            return orderDto;
         }
 
         public async Task<OrderView> GetCart(string username)
@@ -138,7 +159,7 @@ namespace eshop_api.Services.Orders
             return results.Entity;
         }
 
-        public async Task<Order> ChangeStatus(string idOrder, int status)
+        public async Task<Order> ChangeStatus(Guid idOrder, int status)
         {
             var order = _context.Orders.FirstOrDefault(x=> x.Id == idOrder);
             switch(status)
@@ -167,7 +188,7 @@ namespace eshop_api.Services.Orders
             return result.Entity;
         }
 
-        public async Task<bool> DeleteOrderById(string idOrder)
+        public async Task<bool> DeleteOrderById(Guid idOrder)
         {
             var order = _context.Orders.FirstOrDefault(x => x.Id == idOrder);
             if(order != null)
@@ -217,7 +238,7 @@ namespace eshop_api.Services.Orders
             return _context.Orders.ToList();
         }
 
-        public async Task<List<OrderView>> GetOrderById(string idOrder)
+        public async Task<List<OrderView>> GetOrderById(Guid idOrder)
         {
             string payment = "";
             string time = "";
@@ -227,7 +248,7 @@ namespace eshop_api.Services.Orders
             {
                 List<OrderDetailDTOs> details = await _orderDetailService.GetOrderDetailByOrderId(idOrder);
                 List<CreateUpdateAddress> address = await _addressService.GetAddressById((int)order.AddressId);
-                if (order.PaymentMethod == 1) payment = "Banking";
+                if (order.PaymentMethod == PaymentMethod.Online) payment = "Banking";
                 else payment = "COD";
                 if (order.DeliveryTime == 1) time = "Anytime";
                 else time = "Office hours only";
@@ -323,7 +344,7 @@ namespace eshop_api.Services.Orders
             throw null;
         }
 
-        public async Task<Order> UpdateOrder(CreateUpdateOrder createUpdateOrder, string idOrder)
+        public async Task<Order> UpdateOrder(CreateUpdateOrder createUpdateOrder, Guid idOrder)
         {
             var order = _context.Orders.FirstOrDefault(x => x.Id == idOrder);
             if(order != null)
@@ -367,7 +388,7 @@ namespace eshop_api.Services.Orders
             }
         }
 
-        public async Task<bool> UpdateTotal(string idOrder)
+        public async Task<bool> UpdateTotal(Guid idOrder)
         {
             double temp = 0;
             var order = _context.Orders.FirstOrDefault(x=> x.Id == idOrder);

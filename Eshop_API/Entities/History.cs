@@ -16,6 +16,6 @@ namespace eshop_api.Entities
         public DateTime LogoutAt{get;set;}
         public DateTime ActionAt{get;set;}
         public string Action{get;set;}
-        public User User{get;set;}
+        public virtual User User{get;set;}
     }
 }

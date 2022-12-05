@@ -18,7 +18,7 @@ namespace eshop_api.Entities
         public string Name{get;set;}
         [ForeignKey("Province")]
         public int ProvinceId{get; set;}
-        public Province Province{get;set;}
-        public List<Comunity> Comunities{get;set;}
+        public virtual Province Province{get;set;}
+        public virtual List<Comunity> Comunities{get;set;}
     }
 }

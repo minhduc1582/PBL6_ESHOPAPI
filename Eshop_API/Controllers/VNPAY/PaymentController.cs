@@ -15,10 +15,14 @@ namespace Eshop_API.Controllers.VNPAY
             _paymentService = paymentService;
         }
         [HttpGet("IPN")]
-        public async Task ResolvePayMent(){
+        public async Task<IActionResult> ResolvePayMent(){
             var queryString = System.Web.HttpUtility.ParseQueryString(HttpContext.Request.QueryString.Value);
             if(queryString.Count > 0){
-                var result =  _paymentService.ChecksumReponse(queryString);
+                var result = await _paymentService.ChecksumReponse(queryString);
+                return Ok(result);
+            }
+            else{
+                return Ok(new {RspCode = "99",Message = "Input data required"});
             }
         }
     }
