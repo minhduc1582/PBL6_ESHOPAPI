@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
 using eshop_api.Entities;
+using eshop_api.Helpers;
 using Eshop_API.Helpers.Order;
 using Eshop_API.Helpers.VNPAY;
 using Eshop_API.Models.DTO.VNPAY;
@@ -105,7 +106,6 @@ namespace Eshop_API.Services.VNPAY
                 string Version = _configuration["Vnpay:Version"];
                 string Locale = _configuration["Vnpay:Locale"];
                 string Command = _configuration["Vnpay:Command"];
-                string Ref_Bill = DateTime.Now.Ticks.ToString();
                 Paylib pay = new Paylib();
 
                 pay.AddRequestData("vnp_Version", Version); //Phiên bản api mà merchant kết nối. Phiên bản hiện tại là 2.1.0
@@ -120,7 +120,7 @@ namespace Eshop_API.Services.VNPAY
                 pay.AddRequestData("vnp_OrderInfo", payInfo.Content); //Thông tin mô tả nội dung thanh toán
                 pay.AddRequestData("vnp_OrderType", "other"); //topup: Nạp tiền điện thoại - billpayment: Thanh toán hóa đơn - fashion: Thời trang - other: Thanh toán trực tuyến
                 pay.AddRequestData("vnp_ReturnUrl", returnUrl); //URL thông báo kết quả giao dịch khi Khách hàng kết thúc thanh toán
-                pay.AddRequestData("vnp_TxnRef", Ref_Bill); //mã hóa đơn
+                pay.AddRequestData("vnp_TxnRef", payInfo.Tnx_Ref.ToString()); //mã hóa đơn
                 pay.AddRequestData("vnp_Inv_Email", payInfo.Email); //địa chỉ email nhận hóa đơn
                 pay.AddRequestData("vnp_Inv_Customer", payInfo.Name); //Họ tên của khách hàng in trên Hóa đơn điện tử
                 

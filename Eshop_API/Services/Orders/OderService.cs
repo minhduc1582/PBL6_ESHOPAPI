@@ -66,7 +66,8 @@ namespace eshop_api.Services.Orders
                     Amount = result.Total,
                     Email = user.Email,
                     Name = user.FirstName + user.LastName,
-                    Content = "Thanh toan don hang" + result.Id
+                    Content = "Thanh toan don hang " + result.Id,
+                    Tnx_Ref = result.Id
                 };
                 orderDto.PaymentURL = await _vnPayService.CreateRequestUrl(modalPayDto,ipaddr);
                 return orderDto;

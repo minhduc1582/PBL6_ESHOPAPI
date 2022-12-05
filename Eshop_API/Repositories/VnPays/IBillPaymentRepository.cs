@@ -9,6 +9,6 @@ namespace Eshop_API.Repositories.VnPays
 {
     public interface IBillPaymentRepository : IGenericRepository<BillPay>
     {
-        
+        Task SaveChangesAsync();
     }
 }
