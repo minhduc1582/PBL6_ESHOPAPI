@@ -20,8 +20,8 @@ namespace eshop_api.Entities
         public int Id{get;set;}
         public RoleEnum Name{get;set;}
         [JsonIgnore]
-        public List<RoleInPermission> RoleInPermissions{get;set;}
+        public virtual List<RoleInPermission> RoleInPermissions{get;set;}
         [JsonIgnore]
-        public List<User> Users{get;set;}
+        public virtual List<User> Users{get;set;}
     }
 }

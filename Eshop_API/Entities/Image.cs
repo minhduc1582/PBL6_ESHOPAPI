@@ -18,6 +18,6 @@ namespace eshop_api.Entities
         #nullable enable annotations
         public string? Description{get;set;}
         public int ProductID{get;set;}
-        public Product Product{get;set;}
+        public virtual Product Product{get;set;}
     }
 }

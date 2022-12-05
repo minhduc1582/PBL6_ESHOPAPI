@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using eshop_api.Helpers;
 
@@ -10,9 +11,10 @@ using eshop_api.Helpers;
 namespace eshop_api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20221205055336_addBillPay")]
+    partial class addBillPay
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -60,34 +62,6 @@ namespace eshop_api.Migrations
                     b.HasIndex("comunityId");
 
                     b.ToTable("Addresses");
-                });
-
-            modelBuilder.Entity("eshop_api.Entities.BillPay", b =>
-                {
-                    b.Property<Guid>("TnxRef")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("Amount")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("BankCode")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("OrderInfo")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("PayDate")
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TransactionNo")
-                        .HasColumnType("longtext");
-
-                    b.HasKey("TnxRef");
-
-                    b.ToTable("BillPays");
                 });
 
             modelBuilder.Entity("eshop_api.Entities.Category", b =>
@@ -303,8 +277,6 @@ namespace eshop_api.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
 
                     b.HasIndex("ProductId");
 
@@ -526,17 +498,6 @@ namespace eshop_api.Migrations
                     b.Navigation("user");
                 });
 
-            modelBuilder.Entity("eshop_api.Entities.BillPay", b =>
-                {
-                    b.HasOne("eshop_api.Entities.Order", "Order")
-                        .WithMany()
-                        .HasForeignKey("TnxRef")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-                });
-
             modelBuilder.Entity("eshop_api.Entities.Comment", b =>
                 {
                     b.HasOne("eshop_api.Entities.Product", "Product")
@@ -619,19 +580,11 @@ namespace eshop_api.Migrations
 
             modelBuilder.Entity("eshop_api.Entities.OrderDetail", b =>
                 {
-                    b.HasOne("eshop_api.Entities.Order", "Order")
-                        .WithMany()
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("eshop_api.Entities.Product", "Product")
                         .WithMany("OrderDetails")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Order");
 
                     b.Navigation("Product");
                 });

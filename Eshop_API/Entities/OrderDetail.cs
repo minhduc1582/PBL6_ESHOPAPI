@@ -11,13 +11,13 @@ namespace eshop_api.Entities
         [Key]
         public int Id{get;set;}
         [ForeignKey("Order")]
-        public string OrderId{get;set;}
+        public Guid OrderId{get;set;}
         [ForeignKey("Product")]
         public int ProductId{get;set;}
         public int Quantity{get;set;}
         public string Note{get;set;}
-        public Order Order{get;set;}
-        public Product Product{get;set;}
+        public virtual Order Order{get;set;}
+        public virtual Product Product{get;set;}
 
     }
 }

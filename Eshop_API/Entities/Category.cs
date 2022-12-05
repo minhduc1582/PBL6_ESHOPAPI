@@ -18,6 +18,6 @@ namespace eshop_api.Entities
         public string? Code{get;set;}
         public string Name{get;set;}
         public int? ParentId{get;set;}
-        public List<Product> Products{get;set;}
+        public virtual List<Product> Products{get;set;}
     }
 }

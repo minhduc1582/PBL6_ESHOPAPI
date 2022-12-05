@@ -36,9 +36,9 @@ namespace eshop_api.Entities
         public Dictionary<string, object> Detail{get;set;} = new Dictionary<string, object>();
         [ForeignKey("Category")]
         public int CategoryId{get;set;}
-        public Category Category{get;set;}
-        public List<Image> Images{get;set;}
-        public List<OrderDetail> OrderDetails{get;set;}
-        public List<Comment> Comments{get;set;}
+        public virtual Category Category{get;set;}
+        public virtual List<Image> Images{get;set;}
+        public virtual List<OrderDetail> OrderDetails{get;set;}
+        public virtual List<Comment> Comments{get;set;}
     }
 }

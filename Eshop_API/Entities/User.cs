@@ -41,8 +41,11 @@ namespace eshop_api.Entities
         public GenderEnum Gender { get; set; }
         [ForeignKey("Role")]
         public int RoleId{get;set;}
-        public List<Comment> Comments { get; set; }
-        public List<Order> Orders { get; set; }
-        public List<History> Histories { get; set; }
+        [JsonIgnore]
+        public virtual List<Comment> Comments { get; set; }
+        [JsonIgnore]
+        public virtual List<Order> Orders { get; set; }
+        [JsonIgnore]
+        public virtual List<History> Histories { get; set; }
     }
 }
