@@ -22,6 +22,8 @@ using Serilog.Events;
 using Microsoft.Extensions.Logging;
 using Eshop_API.Repositories.Generics;
 using Eshop_API.Repositories.Orders;
+using Eshop_API.Services.VNPAY;
+using Eshop_API.Repositories.VnPays;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;
@@ -109,11 +111,13 @@ services.AddScoped<IJwtUtils, JwtUtils>();
 services.AddTransient<IOrderService, OderService>();
 services.AddTransient<IOderDetailService, OderDetailService>();
 services.AddTransient<IAddressService, AddressService>();
+services.AddTransient<IVnPayService, VnPayService>();
 #endregion
 
 #region Repositories
 services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 services.AddTransient<IOrderRepository, OrderRepository>();
+services.AddTransient<IBillPaymentRepository, BillPaymentRepository>();
 #endregion
 services.AddControllers()
            .AddJsonOptions(options =>

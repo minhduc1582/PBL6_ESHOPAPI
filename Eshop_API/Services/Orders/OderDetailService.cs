@@ -33,7 +33,7 @@ namespace eshop_api.Services.Orders
             // var temp = await UpdateTotal(orderDetail.OrderId);
             return result.Entity;
         }
-        public async Task<OrderDetail> AddOrderDetail(OrderDetailDTO orderDetailDTO, string idOrder)
+        public async Task<OrderDetail> AddOrderDetail(OrderDetailDTO orderDetailDTO, Guid idOrder)
         {
             OrderDetail orderDetail = new OrderDetail();
             orderDetail.OrderId = idOrder;
@@ -68,7 +68,7 @@ namespace eshop_api.Services.Orders
             throw null;
         }
 
-        public List<OrderDetail> GetOrderDetailsByOrderId(string idOrder)
+        public List<OrderDetail> GetOrderDetailsByOrderId(Guid idOrder)
         {
             var orderDetail = _context.OrderDetails.Where(x => x.OrderId == idOrder);
             if(orderDetail != null)
@@ -77,7 +77,7 @@ namespace eshop_api.Services.Orders
             }
             throw null;
         }
-        public async Task<List<OrderDetailDTOs>> GetOrderDetailByOrderId(string idOrder)
+        public async Task<List<OrderDetailDTOs>> GetOrderDetailByOrderId(Guid idOrder)
         {
             var orderDetail = _context.OrderDetails.Where(x => x.OrderId == idOrder).ToList();
             if(orderDetail != null)

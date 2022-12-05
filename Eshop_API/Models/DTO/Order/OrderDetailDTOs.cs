@@ -9,7 +9,7 @@ namespace eshop_api.Models.DTO.Order
     public class OrderDetailDTOs
     {
         public int Id{get;set;}
-        public string OrderId{get;set;}
+        public Guid OrderId{get;set;}
         public int ProductId{get;set;}
         public string AvtImageUrl { get; set; }
         public string ProductName{get; set;}

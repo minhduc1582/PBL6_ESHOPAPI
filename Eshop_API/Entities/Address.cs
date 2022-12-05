@@ -19,9 +19,9 @@ namespace Eshop_API.Entities
         public int CommunityId { get; set; }
         public string address { get; set; }
         public bool IsDefault { get; set; }
-        public User user { get; set; }
-        public Province province { get; set; }
-        public District district { get; set; }
-        public Comunity comunity { get; set; }
+        public virtual User user { get; set; }
+        public virtual Province province { get; set; }
+        public virtual District district { get; set; }
+        public virtual Comunity comunity { get; set; }
     }
 }
