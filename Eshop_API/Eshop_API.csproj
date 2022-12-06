@@ -4,6 +4,11 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>disable</Nullable>
+		<PackageId>pbl6_eshop.test</PackageId>
+		<Version>2.0.0</Version>
+		<Authors>eshop</Authors>
+		<Company>pbl6</Company>
+		<IsPackable>true</IsPackable>
 	</PropertyGroup>
 
 	<ItemGroup>
