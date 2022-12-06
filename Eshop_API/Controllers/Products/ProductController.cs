@@ -12,6 +12,8 @@ using eshop_pbl6.Helpers.Identities;
 using eshop_pbl6.Services.Hub;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Nest;
+using Sentry;
 
 namespace eshop_api.Controllers.Products
 {
@@ -20,26 +22,41 @@ namespace eshop_api.Controllers.Products
         private IHubContext <MessageHub,IMessageHubClient> _messageHub;
         private readonly DataContext _context;
         private readonly IProductService _productService;
-
+        ILogger<ProductController> _logger;
+        private readonly IHub _sentryHub;
+        //private readonly IElasticClient _elasticClient;
         public ProductController(DataContext context,
                                 IProductService productService,
-                                IHubContext <MessageHub,IMessageHubClient> messageHub)
+                                IHubContext <MessageHub,IMessageHubClient> messageHub,
+                                ILogger<ProductController> logger,
+                                IHub sentryHub)
         {
             _context = context;
             _productService = productService;
             _messageHub = messageHub;
+            _logger = logger;
+            _sentryHub = sentryHub;
         }
         [HttpGet("get-list-product")]
         public async Task<ActionResult> GetListProduct([FromQuery]PagedAndSortedResultRequestDto input, int sortOrder){
+                var childSpan = _sentryHub.GetSpan()?.StartChild("additional-work");
+
             try{
+                 _logger.LogInformation("GetListProduct Get - Begin Get list", DateTime.UtcNow);
                 var result = await _productService.GetListProduct(sortOrder);
                 result.Where(x => input.Filter == "" || input.Filter == null || x.Name == input.Filter);
                 var page_list =  PagedList<ProductDto>.ToPagedList(result,
                         input.PageNumber,
                         input.PageSize);
+                throw new NullReferenceException();
+               childSpan?.Finish(SpanStatus.Ok);
+                _logger.LogInformation("GetListProduct Get - Get Success", DateTime.UtcNow);
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,"get dữ liệu thành công",page_list) );
             }
             catch(Exception ex){
+                SentrySdk.CaptureException(ex);
+                childSpan?.Finish(ex);
+                 _logger.LogInformation("GetListProduct Get - Get ERR Exeption: " + ex.Message, DateTime.UtcNow);
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,ex.Message,"null") );
             }
         }
@@ -104,10 +121,12 @@ namespace eshop_api.Controllers.Products
         public async Task<IActionResult> AddProduct([FromForm]CreateUpdateProductDto createProductDto){
             try{
                 if(createProductDto != null){
-                    
                     var result  = await _productService.AddProduct(createProductDto);
-                    if(result != null)
-                    return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,"Thêm dữ liệu thành công",result));
+                    if(result != null){
+                       // await _elasticClient.IndexDocumentAsync(createProductDto);
+                        return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,"Thêm dữ liệu thành công",result));
+                    }
+                    
                 }
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.BadRequest,"Thêm dữ liệu thất bại","null"));
             }
