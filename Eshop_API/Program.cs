@@ -33,7 +33,9 @@ var serverVersion = new MySqlServerVersion(new Version(8, 0, 29));
 // builder.Services.AddControllersWithViews();
 // services.AddDbContext<DataContext>(options =>
 //     options.UseSqlServer(connectionString));
-
+// Add sentry
+var sentryDsn = Environment.GetEnvironmentVariable("Sentry:Dsn");  // <--
+builder.WebHost.UseSentry(sentryDsn); 
 
 // Add services to the container.
 builder.Services.AddSignalR();
@@ -139,6 +141,11 @@ services.AddCors(o =>
 // builder.Logging.AddSerilog();
 
 var app = builder.Build();
+// tracing sentry
+app.UseSentryTracing();    
+
+
+
 
 // if (app.Environment.IsDevelopment())
 // {
