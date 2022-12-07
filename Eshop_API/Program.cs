@@ -24,8 +24,21 @@ using Eshop_API.Repositories.Generics;
 using Eshop_API.Repositories.Orders;
 using Eshop_API.Services.VNPAY;
 using Eshop_API.Repositories.VnPays;
+using Serilog.Sinks.Elasticsearch;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using System;
+using Eshop_API;
 
 var builder = WebApplication.CreateBuilder(args);
+// configur log
+ElasticsearchExtensions.ConfigureLogging();
+builder.Host.UseSerilog();
+// add sentry
+var sentryDsn = builder.Configuration["Sentry:Dsn"]; // <--
+builder.WebHost.UseSentry(sentryDsn); 
+
 var services = builder.Services;
 var connectionString = builder.Configuration.GetConnectionString("Default");
 var serverVersion = new MySqlServerVersion(new Version(8, 0, 29));
@@ -137,26 +150,16 @@ services.AddCors(o =>
 //     .CreateLogger();
 // builder.Logging.ClearProviders();
 // builder.Logging.AddSerilog();
+// 
+
+// add elastic search
+services.AddElasticsearch(builder.Configuration);
+
+
 
 var app = builder.Build();
-
-// if (app.Environment.IsDevelopment())
-// {
-//             Log.Logger = new LoggerConfiguration()
-//                 .MinimumLevel.Information()
-//                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-//                 .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
-//                 .Enrich.FromLogContext()
-//                 .WriteTo.Async(c => c.File("Logs/logs.log"))
-//                 .CreateLogger();
-
-//             builder.Logging.ClearProviders();
-//             builder.Logging.AddEventLog();
-//             builder.Logging.AddSerilog();
-// }
-
-// var loggerFactory = app.Services.GetService<ILoggerFactory>();
-// loggerFactory.AddFile(builder.Configuration["Logging:LogFilePath"].ToString()); 
+// tracing sentry
+app.UseSentryTracing();
 
 // Set Port
 #nullable enable annotations 
@@ -195,3 +198,36 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+
+
+// void ConfigureLogging()
+// {
+//     var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+//     var configuration = new ConfigurationBuilder()
+//         .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+//         .AddJsonFile(
+//             $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")}.json",
+//             optional: true)
+//         .Build();
+
+//     Log.Logger = new LoggerConfiguration()
+//         .Enrich.FromLogContext()
+//         .Enrich.WithMachineName()
+//         .WriteTo.Debug()
+//         .WriteTo.Console()
+//         .WriteTo.Elasticsearch(ConfigureElasticSink(configuration, environment))
+//         .WriteTo.File("Logs/logs.log")
+//         .Enrich.WithProperty("Environment", environment)
+//         .ReadFrom.Configuration(configuration)
+//         .CreateLogger();
+// }
+
+// ElasticsearchSinkOptions ConfigureElasticSink(IConfigurationRoot configuration, string environment)
+// {
+//     return new ElasticsearchSinkOptions(new Uri(configuration["ElasticConfiguration:Uri"]))
+//     {
+//         AutoRegisterTemplate = true,
+//         IndexFormat = $"{Assembly.GetExecutingAssembly().GetName().Name.ToLower().Replace(".", "-")}-{environment?.ToLower().Replace(".", "-")}-{DateTime.UtcNow:yyyy-MM}"
+//     };
+// }
