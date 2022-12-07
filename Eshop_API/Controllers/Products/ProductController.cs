@@ -48,7 +48,6 @@ namespace eshop_api.Controllers.Products
                 var page_list =  PagedList<ProductDto>.ToPagedList(result,
                         input.PageNumber,
                         input.PageSize);
-                throw new NullReferenceException();
                childSpan?.Finish(SpanStatus.Ok);
                 _logger.LogInformation("GetListProduct Get - Get Success", DateTime.UtcNow);
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,"get dữ liệu thành công",page_list) );
@@ -157,6 +156,21 @@ namespace eshop_api.Controllers.Products
             }
             catch(Exception ex){
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.ErrorException,ex.Message,"null"));
+            }
+        }
+        [HttpGet("get-undefined")]
+        public async Task<ActionResult> TestSlack([FromQuery]PagedAndSortedResultRequestDto input, int sortOrder){
+                var childSpan = _sentryHub.GetSpan()?.StartChild("additional-work");
+
+            try{
+                _logger.LogInformation("Get Undefined - Begin Get list", DateTime.UtcNow);
+                throw new NullReferenceException();
+            }
+            catch(Exception ex){
+                SentrySdk.CaptureException(ex);
+                childSpan?.Finish(ex);
+                 _logger.LogInformation("Get Undefined - Get ERR Exeption: " + ex.Message, DateTime.UtcNow);
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,ex.Message,"null") );
             }
         }
     }
