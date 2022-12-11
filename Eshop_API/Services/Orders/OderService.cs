@@ -43,6 +43,7 @@ namespace eshop_api.Services.Orders
             {
                 var product = _context.Products.FirstOrDefault(x=> x.Id == i.ProductId);
                 temp += i.Quantity * product.Price;
+                await DelFromCart(i.ProductId, username, i.Quantity);
             }
             Order order = new Order();
             order.Status = Status.Pending.ToString();
