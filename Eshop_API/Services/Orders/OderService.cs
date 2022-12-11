@@ -43,6 +43,7 @@ namespace eshop_api.Services.Orders
             {
                 var product = _context.Products.FirstOrDefault(x=> x.Id == i.ProductId);
                 temp += i.Quantity * product.Price;
+                await DelFromCart(i.ProductId, username, i.Quantity);
             }
             Order order = new Order();
             order.Status = Status.Pending.ToString();
@@ -247,7 +248,7 @@ namespace eshop_api.Services.Orders
             if(order!=null)
             {
                 List<OrderDetailDTOs> details = await _orderDetailService.GetOrderDetailByOrderId(idOrder);
-                List<CreateUpdateAddress> address = await _addressService.GetAddressById((int)order.AddressId);
+                List<AddressView> address = await _addressService.GetAddressById((int)order.AddressId);
                 if (order.PaymentMethod == PaymentMethod.Online) payment = "Banking";
                 else payment = "COD";
                 if (order.DeliveryTime == 1) time = "Anytime";

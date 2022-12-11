@@ -7,8 +7,8 @@ namespace eshop_pbl6.Services.Addresses
 {
     public interface IAddressService
     {
-        List<CreateUpdateAddress> GetListAddressByUser(string username);
-        Task<List<CreateUpdateAddress>> GetAddressById(int idAddress);
+        List<AddressView> GetListAddressByUser(string username);
+        Task<List<AddressView>> GetAddressById(int idAddress);
         Task<Address> AddAddress(CreateUpdateAddress createUpdateAddress, string username);
         Task<Address> UpdateAddress(CreateUpdateAddress createUpdateAddress, int idAddress);
         Task<bool> DelAddress(int idAddress);
