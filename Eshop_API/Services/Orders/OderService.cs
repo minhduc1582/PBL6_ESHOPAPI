@@ -15,6 +15,10 @@ using Eshop_API.Helpers.Order;
 using Newtonsoft.Json;
 using Eshop_API.Services.VNPAY;
 using Eshop_API.Models.DTO.VNPAY;
+using System.Net.WebSockets;
+using Nest;
+using static Nest.JoinField;
+using Status = eshop_pbl6.Helpers.Order.Status;
 
 namespace eshop_api.Services.Orders
 {
@@ -79,7 +83,7 @@ namespace eshop_api.Services.Orders
         public async Task<OrderView> GetCart(string username)
         {
             int userId = _context.AppUsers.FirstOrDefault(x => x.Username == username).Id;
-            List<Order> orders = GetOrderByStatusOfEachUser(userId, 1).ToList();
+            var orders = _context.Orders.Where(x => x.Status == Status.Cart.ToString()).ToList();
             OrderView order = new OrderView();
             if(orders!=null)
             {
@@ -119,7 +123,7 @@ namespace eshop_api.Services.Orders
             var product = _context.Products.FirstOrDefault(x=> x.Id == detailDTOs.ProductId);
             temp += detailDTOs.Quantity * product.Price;
             Boolean isExist = false;
-            List<Order> orders = GetOrdersByUserId(userId).ToList();
+            var orders = _context.Orders.Where(x => x.UserId == userId).ToList();
             foreach(Order i in orders)
             {
                 if(i.Status == "Cart")
@@ -204,7 +208,8 @@ namespace eshop_api.Services.Orders
         public async Task<Order> DelFromCart(int idProduct, string username, int quantity)
         {
             int userId = _context.AppUsers.FirstOrDefault(x => x.Username == username).Id;
-            List<Order> order = GetOrderByStatusOfEachUser(userId, 1).ToList();
+            var order = _context.Orders.Where(x => x.Status == Status.Cart.ToString()).ToList();
+            //List<Order> order = GetOrderByStatusOfEachUser(userId, 1).ToList();
             foreach(Order i in order)
             {
                 List<OrderDetail> orderDetails = _orderDetailService.GetOrderDetailsByOrderId(i.Id).ToList();
@@ -234,9 +239,48 @@ namespace eshop_api.Services.Orders
             throw new NotImplementedException();
         }
 
-        public List<Order> GetListOrders()
+        public async Task<List<OrderView>> GetListOrders()
         {
-            return _context.Orders.ToList();
+            string payment = "";
+            string time = "";
+            var order = _context.Orders.ToList();
+            List<OrderView> list = new List<OrderView>();
+            if (order != null)
+            {
+                foreach(Order i in order)
+                {
+                    if (i.Status != Status.Cart.ToString())
+                    {
+                        List<OrderDetailDTOs> details = await _orderDetailService.GetOrderDetailByOrderId(i.Id);
+                        List<AddressView> address = await _addressService.GetAddressById((int)i.AddressId);
+                        if (i.PaymentMethod == PaymentMethod.Online) payment = "Banking";
+                        else payment = "COD";
+                        if (i.DeliveryTime == 1) time = "Anytime";
+                        else time = "Office hours only";
+                        list.Add(new OrderView()
+                        {
+                            Id = i.Id,
+                            Status = i.Status,
+                            Total = i.Total,
+                            Note = i.Note,
+                            Check = i.Check,
+                            CheckedAt = i.CheckedAt,
+                            CheckedBy = i.CheckedBy,
+                            CheckedComment = i.CheckedComment,
+                            UserId = i.UserId,
+                            list = details,
+                            address = address,
+                            Time = time,
+                            Payment = payment
+                        });
+                        //var orderView = await GetOrderById(i.Id);
+                        //foreach(OrderView j in orderView)
+                        //    list.Add(j);
+                    }
+                }
+                return await Task.FromResult(list);
+            }
+            throw null;
         }
 
         public async Task<List<OrderView>> GetOrderById(Guid idOrder)
@@ -273,9 +317,10 @@ namespace eshop_api.Services.Orders
             throw null;
         }
 
-        public List<Order> GetOrderByStatusOfEachUser(int userId, int status)
+        public async Task<List<OrderView>> GetOrderByStatusOfEachUser(string username, int status)
         {
-            var order = GetOrdersByUserId(userId);
+            int userId = _context.AppUsers.FirstOrDefault(x => x.Username == username).Id;
+            var order = await GetOrdersByUserId(userId);
             string statuss = "";
             switch(status)
             {
@@ -295,8 +340,8 @@ namespace eshop_api.Services.Orders
                     statuss = Status.Cancel.ToString();
                     break;
             }
-            List<Order> temp = new List<Order>();
-            foreach(Order i in order)
+            List<OrderView> temp = new List<OrderView>();
+            foreach(OrderView i in order)
             {
                 if(i.Status == statuss)
                 {
@@ -306,8 +351,10 @@ namespace eshop_api.Services.Orders
             return temp;
         }
 
-        public List<Order> GetOrdersByStatus(int status)
+        public async Task<List<OrderView>> GetOrdersByStatus(int status)
         {
+            string payment = "";
+            string time = "";
             string statuss = "";
             switch(status)
             {
@@ -327,20 +374,86 @@ namespace eshop_api.Services.Orders
                     statuss = Status.Cancel.ToString();
                     break;
             }
-            var order = _context.Orders.Where(x => x.Status == statuss);
-            if(order != null)
+            var order = _context.Orders.Where(x => x.Status == statuss).ToList();
+            List<OrderView> list = new List<OrderView>();
+            if (order != null)
             {
-                return order.ToList();
+                foreach (Order i in order)
+                {
+                    if (i.Status != Status.Cart.ToString())
+                    {
+                        List<OrderDetailDTOs> details = await _orderDetailService.GetOrderDetailByOrderId(i.Id);
+                        List<AddressView> address = await _addressService.GetAddressById((int)i.AddressId);
+                        if (i.PaymentMethod == PaymentMethod.Online) payment = "Banking";
+                        else payment = "COD";
+                        if (i.DeliveryTime == 1) time = "Anytime";
+                        else time = "Office hours only";
+                        list.Add(new OrderView()
+                        {
+                            Id = i.Id,
+                            Status = i.Status,
+                            Total = i.Total,
+                            Note = i.Note,
+                            Check = i.Check,
+                            CheckedAt = i.CheckedAt,
+                            CheckedBy = i.CheckedBy,
+                            CheckedComment = i.CheckedComment,
+                            UserId = i.UserId,
+                            list = details,
+                            address = address,
+                            Time = time,
+                            Payment = payment
+                        });
+                        //var orderView = await GetOrderById(i.Id);
+                        //foreach(OrderView j in orderView)
+                        //    list.Add(j);
+                    }
+                }
+                return await Task.FromResult(list);
             }
             throw null;
         }
 
-        public List<Order> GetOrdersByUserId(int userId)
+        public async Task<List<OrderView>> GetOrdersByUserId(int userId)
         {
-            var order = _context.Orders.Where(x => x.UserId == userId);
-            if(order != null)
+            string payment = "";
+            string time = "";
+            var order = _context.Orders.Where(x => x.UserId == userId).ToList();
+            List<OrderView> list = new List<OrderView>();
+            if (order != null)
             {
-                return order.ToList();
+                foreach (Order i in order)
+                {
+                    if (i.Status != Status.Cart.ToString())
+                    {
+                        List<OrderDetailDTOs> details = await _orderDetailService.GetOrderDetailByOrderId(i.Id);
+                        List<AddressView> address = await _addressService.GetAddressById((int)i.AddressId);
+                        if (i.PaymentMethod == PaymentMethod.Online) payment = "Banking";
+                        else payment = "COD";
+                        if (i.DeliveryTime == 1) time = "Anytime";
+                        else time = "Office hours only";
+                        list.Add(new OrderView()
+                        {
+                            Id = i.Id,
+                            Status = i.Status,
+                            Total = i.Total,
+                            Note = i.Note,
+                            Check = i.Check,
+                            CheckedAt = i.CheckedAt,
+                            CheckedBy = i.CheckedBy,
+                            CheckedComment = i.CheckedComment,
+                            UserId = i.UserId,
+                            list = details,
+                            address = address,
+                            Time = time,
+                            Payment = payment
+                        });
+                        //var orderView = await GetOrderById(i.Id);
+                        //foreach(OrderView j in orderView)
+                        //    list.Add(j);
+                    }
+                }
+                return await Task.FromResult(list);
             }
             throw null;
         }

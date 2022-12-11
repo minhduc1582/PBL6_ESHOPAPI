@@ -14,6 +14,9 @@ using System.IdentityModel.Tokens.Jwt;
 using Eshop_API.Services.VNPAY;
 using Eshop_API.Models.DTO.VNPAY;
 using Eshop_API.Helpers.Order;
+using eshop_api.Models.DTO.Products;
+using Nest;
+using System.Net.WebSockets;
 
 namespace eshop_api.Controllers.Products
 {
@@ -28,11 +31,17 @@ namespace eshop_api.Controllers.Products
          //   _vnPayService = vnPayService;
         }
         [HttpGet("get-list-order")]
-        public IActionResult GetListOrders()
+        public async Task<IActionResult> GetListOrders([FromQuery]PagedAndSortedResultRequestDto input)
         {
-            try{
-                var result = _orderService.GetListOrders();
-                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "lấy dữ liệu thành công", result));
+            try
+            {
+                var result = await _orderService.GetListOrders();
+                result.Where(x => input.Filter == "" || input.Filter == null || x.Id.ToString() == input.Filter);
+                var page_list = PagedList<OrderView>.ToPagedList(result,
+                        input.PageNumber,
+                        input.PageSize);
+
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "lấy dữ liệu thành công", page_list));
             }
             catch(Exception ex)
             {
@@ -40,11 +49,17 @@ namespace eshop_api.Controllers.Products
             }
         }
         [HttpGet("get-order-by-userid")]
-        public IActionResult GetOrdersByUserId(int userId)
+        public async Task<IActionResult> GetOrdersByUserId([FromQuery] PagedAndSortedResultRequestDto input, int userId)
         {
             try{
-                var result = _orderService.GetOrdersByUserId(userId);
-                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "lấy dữ liệu thành công", result));
+                List<OrderView> result = new List<OrderView>();
+                if (userId == 0) result = await _orderService.GetListOrders();
+                else result = await _orderService.GetOrdersByUserId(userId);
+                result.Where(x => input.Filter == "" || input.Filter == null || x.Id.ToString() == input.Filter);
+                var page_list = PagedList<OrderView>.ToPagedList(result,
+                        input.PageNumber,
+                        input.PageSize);
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "lấy dữ liệu thành công", page_list));
             }
             catch(Exception ex)
             {
@@ -52,11 +67,18 @@ namespace eshop_api.Controllers.Products
             }
         }
         [HttpGet("get-order-by-id")]
-        public IActionResult GetOrderById(Guid idOrder)
+        public async Task<IActionResult> GetOrderById([FromQuery] PagedAndSortedResultRequestDto input, Guid idOrder)
         {
-            try{
-                var result = _orderService.GetOrderById(idOrder);
-                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "lấy dữ liệu thành công", result));
+            try
+            {
+                List<OrderView> result = new List<OrderView>();
+                if (idOrder.ToString() == null) result = await _orderService.GetListOrders();
+                else result = await _orderService.GetOrderById(idOrder);
+                result.Where(x => input.Filter == "" || input.Filter == null || x.Id.ToString() == input.Filter);
+                var page_list = PagedList<OrderView>.ToPagedList(result,
+                        input.PageNumber,
+                        input.PageSize);
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "lấy dữ liệu thành công", page_list));
             }
             catch(Exception ex)
             {
@@ -64,11 +86,18 @@ namespace eshop_api.Controllers.Products
             }
         }
         [HttpGet("get-order-by-status")]
-        public IActionResult GetOrdersByStatus(int status)
+        public async Task<IActionResult> GetOrdersByStatus([FromQuery] PagedAndSortedResultRequestDto input, int status)
         {
-            try{
-                var result = _orderService.GetOrdersByStatus(status);
-                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "lấy dữ liệu thành công", result));
+            try
+            {
+                List<OrderView> result = new List<OrderView>();
+                if (status == 0) result = await _orderService.GetListOrders();
+                else result = await _orderService.GetOrdersByStatus(status);
+                result.Where(x => input.Filter == "" || input.Filter == null || x.Id.ToString() == input.Filter);
+                var page_list = PagedList<OrderView>.ToPagedList(result,
+                        input.PageNumber,
+                        input.PageSize);
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "lấy dữ liệu thành công", page_list));
             }
             catch(Exception ex)
             {
@@ -76,11 +105,22 @@ namespace eshop_api.Controllers.Products
             }
         }
         [HttpGet("get-order-by-status-of-each-user")]
-        public IActionResult GetOrderByStatusOfEachUser(int userId, int status)
+        [Authorize(EshopPermissions.OrderPermissions.Get)]
+        public async Task<IActionResult> GetOrderByStatusOfEachUser([FromQuery] PagedAndSortedResultRequestDto input, int status)
         {
             try{
-                var result = _orderService.GetOrderByStatusOfEachUser(userId, status);
-                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "lấy dữ liệu thành công", result));
+                string remoteIpAddress = HttpContext.Connection.RemoteIpAddress.ToString();
+                //var serId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                var handler = new JwtSecurityTokenHandler();
+                var jwtSecurityToken = handler.ReadJwtToken(token);
+                var username = jwtSecurityToken.Claims.First(claim => claim.Type == "nameid").Value;
+                var result = await _orderService.GetOrderByStatusOfEachUser(username, status);
+                result.Where(x => input.Filter == "" || input.Filter == null || x.Id.ToString() == input.Filter);
+                var page_list = PagedList<OrderView>.ToPagedList(result,
+                        input.PageNumber,
+                        input.PageSize);
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "lấy dữ liệu thành công", page_list));
             }
             catch(Exception ex)
             {
