@@ -30,15 +30,17 @@ namespace eshop_pbl6.Services.Addresses
             return _context.Comunities.Where(x => x.DistrictId == idDistrict).ToList();
         }
 
-        public List<CreateUpdateAddress> GetListAddressByUser(string username)
+        public List<AddressView> GetListAddressByUser(string username)
         {
             int userId = _context.AppUsers.FirstOrDefault(x => x.Username == username).Id;
-            List<CreateUpdateAddress> addresses = new List<CreateUpdateAddress>();
+            List<AddressView> addresses = new List<AddressView>();
             List<Address> list = _context.Addresses.Where(x => x.UserId == userId).ToList();
             foreach(Address i in list)
             {
-                addresses.Add(new CreateUpdateAddress
+                addresses.Add(new AddressView
                 {
+                    Id = i.Id,
+                    UserId = i.UserId,
                     Phone = i.Phone,
                     ProvinceName = _context.Provinces.FirstOrDefault(x => x.Id == i.ProvinceId).Name,
                     DistrictName = _context.Dictricts.FirstOrDefault(x => x.Id == i.DistrictId).Name,
@@ -50,12 +52,14 @@ namespace eshop_pbl6.Services.Addresses
             return addresses;
         }
 
-        public async Task<List<CreateUpdateAddress>> GetAddressById(int idAddress)
+        public async Task<List<AddressView>> GetAddressById(int idAddress)
         {
             var address = _context.Addresses.FirstOrDefault(x => x.Id == idAddress);
-            List<CreateUpdateAddress> addresses = new List<CreateUpdateAddress>();
-            addresses.Add(new CreateUpdateAddress
+            List<AddressView> addresses = new List<AddressView>();
+            addresses.Add(new AddressView
             {
+                Id = address.Id,
+                UserId = address.UserId,
                 Phone = address.Phone,
                 ProvinceName = _context.Provinces.FirstOrDefault(x => x.Id == address.ProvinceId).Name,
                 DistrictName = _context.Dictricts.FirstOrDefault(x => x.Id == address.DistrictId).Name,

@@ -20,7 +20,7 @@ namespace eshop_api.Models.DTO.Order
         public string CheckedComment { get; set; }
         public int UserId { get; set; }
         public List<OrderDetailDTOs> list {get; set;}
-        public List<CreateUpdateAddress> address { get; set; }
+        public List<AddressView> address { get; set; }
         public string Payment { get; set; }
         public string Time { get; set; }
     }
