@@ -31,11 +31,11 @@ namespace eshop_api.Controllers.Products
          //   _vnPayService = vnPayService;
         }
         [HttpGet("get-list-order")]
-        public async Task<IActionResult> GetListOrders([FromQuery]PagedAndSortedResultRequestDto input)
+        public async Task<IActionResult> GetListOrders([FromQuery]PagedAndSortedResultRequestDto input, bool getDetails)
         {
             try
             {
-                var result = await _orderService.GetListOrders();
+                var result = await _orderService.GetListOrders(getDetails);
                 result.Where(x => input.Filter == "" || input.Filter == null || x.Id.ToString() == input.Filter);
                 var page_list = PagedList<OrderView>.ToPagedList(result,
                         input.PageNumber,
@@ -49,12 +49,12 @@ namespace eshop_api.Controllers.Products
             }
         }
         [HttpGet("get-order-by-userid")]
-        public async Task<IActionResult> GetOrdersByUserId([FromQuery] PagedAndSortedResultRequestDto input, int userId)
+        public async Task<IActionResult> GetOrdersByUserId([FromQuery] PagedAndSortedResultRequestDto input, int userId, bool getDetails)
         {
             try{
                 List<OrderView> result = new List<OrderView>();
-                if (userId == 0) result = await _orderService.GetListOrders();
-                else result = await _orderService.GetOrdersByUserId(userId);
+                if (userId == 0) result = await _orderService.GetListOrders(getDetails);
+                else result = await _orderService.GetOrdersByUserId(userId, getDetails);
                 result.Where(x => input.Filter == "" || input.Filter == null || x.Id.ToString() == input.Filter);
                 var page_list = PagedList<OrderView>.ToPagedList(result,
                         input.PageNumber,
@@ -72,7 +72,7 @@ namespace eshop_api.Controllers.Products
             try
             {
                 List<OrderView> result = new List<OrderView>();
-                if (idOrder.ToString() == null) result = await _orderService.GetListOrders();
+                if (idOrder.ToString() == null) result = await _orderService.GetListOrders(true);
                 else result = await _orderService.GetOrderById(idOrder);
                 result.Where(x => input.Filter == "" || input.Filter == null || x.Id.ToString() == input.Filter);
                 var page_list = PagedList<OrderView>.ToPagedList(result,
@@ -86,13 +86,13 @@ namespace eshop_api.Controllers.Products
             }
         }
         [HttpGet("get-order-by-status")]
-        public async Task<IActionResult> GetOrdersByStatus([FromQuery] PagedAndSortedResultRequestDto input, int status)
+        public async Task<IActionResult> GetOrdersByStatus([FromQuery] PagedAndSortedResultRequestDto input, int status, bool getDetails)
         {
             try
             {
                 List<OrderView> result = new List<OrderView>();
-                if (status == 0) result = await _orderService.GetListOrders();
-                else result = await _orderService.GetOrdersByStatus(status);
+                if (status == 0) result = await _orderService.GetListOrders(getDetails);
+                else result = await _orderService.GetOrdersByStatus(status, getDetails);
                 result.Where(x => input.Filter == "" || input.Filter == null || x.Id.ToString() == input.Filter);
                 var page_list = PagedList<OrderView>.ToPagedList(result,
                         input.PageNumber,
@@ -106,7 +106,7 @@ namespace eshop_api.Controllers.Products
         }
         [HttpGet("get-order-by-status-of-each-user")]
         [Authorize(EshopPermissions.OrderPermissions.Get)]
-        public async Task<IActionResult> GetOrderByStatusOfEachUser([FromQuery] PagedAndSortedResultRequestDto input, int status)
+        public async Task<IActionResult> GetOrderByStatusOfEachUser([FromQuery] PagedAndSortedResultRequestDto input, int status, bool getDetails)
         {
             try{
                 string remoteIpAddress = HttpContext.Connection.RemoteIpAddress.ToString();
@@ -115,7 +115,7 @@ namespace eshop_api.Controllers.Products
                 var handler = new JwtSecurityTokenHandler();
                 var jwtSecurityToken = handler.ReadJwtToken(token);
                 var username = jwtSecurityToken.Claims.First(claim => claim.Type == "nameid").Value;
-                var result = await _orderService.GetOrderByStatusOfEachUser(username, status);
+                var result = await _orderService.GetOrderByStatusOfEachUser(username, status, getDetails);
                 result.Where(x => input.Filter == "" || input.Filter == null || x.Id.ToString() == input.Filter);
                 var page_list = PagedList<OrderView>.ToPagedList(result,
                         input.PageNumber,

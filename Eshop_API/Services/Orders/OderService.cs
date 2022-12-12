@@ -239,11 +239,11 @@ namespace eshop_api.Services.Orders
             throw new NotImplementedException();
         }
 
-        public async Task<List<OrderView>> GetListOrders()
+        public async Task<List<OrderView>> GetListOrders(bool getDetails)
         {
             string payment = "";
             string time = "";
-            var order = _context.Orders.ToList();
+            var order = _context.Orders.Take(5).ToList();
             List<OrderView> list = new List<OrderView>();
             if (order != null)
             {
@@ -251,31 +251,58 @@ namespace eshop_api.Services.Orders
                 {
                     if (i.Status != Status.Cart.ToString())
                     {
-                        List<OrderDetailDTOs> details = await _orderDetailService.GetOrderDetailByOrderId(i.Id);
-                        List<AddressView> address = await _addressService.GetAddressById((int)i.AddressId);
-                        if (i.PaymentMethod == PaymentMethod.Online) payment = "Banking";
-                        else payment = "COD";
-                        if (i.DeliveryTime == 1) time = "Anytime";
-                        else time = "Office hours only";
-                        list.Add(new OrderView()
+                        if (getDetails == true)
                         {
-                            Id = i.Id,
-                            Status = i.Status,
-                            Total = i.Total,
-                            Note = i.Note,
-                            Check = i.Check,
-                            CheckedAt = i.CheckedAt,
-                            CheckedBy = i.CheckedBy,
-                            CheckedComment = i.CheckedComment,
-                            UserId = i.UserId,
-                            list = details,
-                            address = address,
-                            Time = time,
-                            Payment = payment
-                        });
-                        //var orderView = await GetOrderById(i.Id);
-                        //foreach(OrderView j in orderView)
-                        //    list.Add(j);
+                            List<OrderDetailDTOs> details = await _orderDetailService.GetOrderDetailByOrderId(i.Id);
+                            List<AddressView> address = await _addressService.GetAddressById((int)i.AddressId);
+                            if (i.PaymentMethod == PaymentMethod.Online) payment = "Banking";
+                            else payment = "COD";
+                            if (i.DeliveryTime == 1) time = "Anytime";
+                            else time = "Office hours only";
+                            list.Add(new OrderView()
+                            {
+                                Id = i.Id,
+                                Status = i.Status,
+                                Total = i.Total,
+                                Note = i.Note,
+                                Check = i.Check,
+                                CheckedAt = i.CheckedAt,
+                                CheckedBy = i.CheckedBy,
+                                CheckedComment = i.CheckedComment,
+                                UserId = i.UserId,
+                                list = details,
+                                address = address,
+                                Time = time,
+                                Payment = payment
+                            });
+                            //var orderView = await GetOrderById(i.Id);
+                            //foreach(OrderView j in orderView)
+                            //    list.Add(j);
+                        }
+                        else
+                        {
+                            List<AddressView> address = await _addressService.GetAddressById((int)i.AddressId);
+                            if (i.PaymentMethod == PaymentMethod.Online) payment = "Banking";
+                            else payment = "COD";
+                            if (i.DeliveryTime == 1) time = "Anytime";
+                            else time = "Office hours only";
+                            list.Add(new OrderView()
+                            {
+                                Id = i.Id,
+                                Status = i.Status,
+                                Total = i.Total,
+                                Note = i.Note,
+                                Check = i.Check,
+                                CheckedAt = i.CheckedAt,
+                                CheckedBy = i.CheckedBy,
+                                CheckedComment = i.CheckedComment,
+                                UserId = i.UserId,
+                                list = null,
+                                address = address,
+                                Time = time,
+                                Payment = payment
+                            });
+                        }
                     }
                 }
                 return await Task.FromResult(list);
@@ -317,10 +344,10 @@ namespace eshop_api.Services.Orders
             throw null;
         }
 
-        public async Task<List<OrderView>> GetOrderByStatusOfEachUser(string username, int status)
+        public async Task<List<OrderView>> GetOrderByStatusOfEachUser(string username, int status, bool getDetails)
         {
             int userId = _context.AppUsers.FirstOrDefault(x => x.Username == username).Id;
-            var order = await GetOrdersByUserId(userId);
+            var order = await GetOrdersByUserId(userId, getDetails);
             string statuss = "";
             switch(status)
             {
@@ -351,7 +378,7 @@ namespace eshop_api.Services.Orders
             return temp;
         }
 
-        public async Task<List<OrderView>> GetOrdersByStatus(int status)
+        public async Task<List<OrderView>> GetOrdersByStatus(int status, bool getDetails)
         {
             string payment = "";
             string time = "";
@@ -374,7 +401,7 @@ namespace eshop_api.Services.Orders
                     statuss = Status.Cancel.ToString();
                     break;
             }
-            var order = _context.Orders.Where(x => x.Status == statuss).ToList();
+            var order = _context.Orders.Where(x => x.Status == statuss).Take(5).ToList();
             List<OrderView> list = new List<OrderView>();
             if (order != null)
             {
@@ -382,31 +409,58 @@ namespace eshop_api.Services.Orders
                 {
                     if (i.Status != Status.Cart.ToString())
                     {
-                        List<OrderDetailDTOs> details = await _orderDetailService.GetOrderDetailByOrderId(i.Id);
-                        List<AddressView> address = await _addressService.GetAddressById((int)i.AddressId);
-                        if (i.PaymentMethod == PaymentMethod.Online) payment = "Banking";
-                        else payment = "COD";
-                        if (i.DeliveryTime == 1) time = "Anytime";
-                        else time = "Office hours only";
-                        list.Add(new OrderView()
+                        if (getDetails == true)
                         {
-                            Id = i.Id,
-                            Status = i.Status,
-                            Total = i.Total,
-                            Note = i.Note,
-                            Check = i.Check,
-                            CheckedAt = i.CheckedAt,
-                            CheckedBy = i.CheckedBy,
-                            CheckedComment = i.CheckedComment,
-                            UserId = i.UserId,
-                            list = details,
-                            address = address,
-                            Time = time,
-                            Payment = payment
-                        });
-                        //var orderView = await GetOrderById(i.Id);
-                        //foreach(OrderView j in orderView)
-                        //    list.Add(j);
+                            List<OrderDetailDTOs> details = await _orderDetailService.GetOrderDetailByOrderId(i.Id);
+                            List<AddressView> address = await _addressService.GetAddressById((int)i.AddressId);
+                            if (i.PaymentMethod == PaymentMethod.Online) payment = "Banking";
+                            else payment = "COD";
+                            if (i.DeliveryTime == 1) time = "Anytime";
+                            else time = "Office hours only";
+                            list.Add(new OrderView()
+                            {
+                                Id = i.Id,
+                                Status = i.Status,
+                                Total = i.Total,
+                                Note = i.Note,
+                                Check = i.Check,
+                                CheckedAt = i.CheckedAt,
+                                CheckedBy = i.CheckedBy,
+                                CheckedComment = i.CheckedComment,
+                                UserId = i.UserId,
+                                list = details,
+                                address = address,
+                                Time = time,
+                                Payment = payment
+                            });
+                            //var orderView = await GetOrderById(i.Id);
+                            //foreach(OrderView j in orderView)
+                            //    list.Add(j);
+                        }
+                        else
+                        {
+                            List<AddressView> address = await _addressService.GetAddressById((int)i.AddressId);
+                            if (i.PaymentMethod == PaymentMethod.Online) payment = "Banking";
+                            else payment = "COD";
+                            if (i.DeliveryTime == 1) time = "Anytime";
+                            else time = "Office hours only";
+                            list.Add(new OrderView()
+                            {
+                                Id = i.Id,
+                                Status = i.Status,
+                                Total = i.Total,
+                                Note = i.Note,
+                                Check = i.Check,
+                                CheckedAt = i.CheckedAt,
+                                CheckedBy = i.CheckedBy,
+                                CheckedComment = i.CheckedComment,
+                                UserId = i.UserId,
+                                list = null,
+                                address = address,
+                                Time = time,
+                                Payment = payment
+                            });
+                        }
                     }
                 }
                 return await Task.FromResult(list);
@@ -414,11 +468,11 @@ namespace eshop_api.Services.Orders
             throw null;
         }
 
-        public async Task<List<OrderView>> GetOrdersByUserId(int userId)
+        public async Task<List<OrderView>> GetOrdersByUserId(int userId, bool getDetails)
         {
             string payment = "";
             string time = "";
-            var order = _context.Orders.Where(x => x.UserId == userId).ToList();
+            var order = _context.Orders.Where(x => x.UserId == userId).Take(5).ToList();
             List<OrderView> list = new List<OrderView>();
             if (order != null)
             {
@@ -426,31 +480,58 @@ namespace eshop_api.Services.Orders
                 {
                     if (i.Status != Status.Cart.ToString())
                     {
-                        List<OrderDetailDTOs> details = await _orderDetailService.GetOrderDetailByOrderId(i.Id);
-                        List<AddressView> address = await _addressService.GetAddressById((int)i.AddressId);
-                        if (i.PaymentMethod == PaymentMethod.Online) payment = "Banking";
-                        else payment = "COD";
-                        if (i.DeliveryTime == 1) time = "Anytime";
-                        else time = "Office hours only";
-                        list.Add(new OrderView()
+                        if (getDetails == true)
                         {
-                            Id = i.Id,
-                            Status = i.Status,
-                            Total = i.Total,
-                            Note = i.Note,
-                            Check = i.Check,
-                            CheckedAt = i.CheckedAt,
-                            CheckedBy = i.CheckedBy,
-                            CheckedComment = i.CheckedComment,
-                            UserId = i.UserId,
-                            list = details,
-                            address = address,
-                            Time = time,
-                            Payment = payment
-                        });
-                        //var orderView = await GetOrderById(i.Id);
-                        //foreach(OrderView j in orderView)
-                        //    list.Add(j);
+                            List<OrderDetailDTOs> details = await _orderDetailService.GetOrderDetailByOrderId(i.Id);
+                            List<AddressView> address = await _addressService.GetAddressById((int)i.AddressId);
+                            if (i.PaymentMethod == PaymentMethod.Online) payment = "Banking";
+                            else payment = "COD";
+                            if (i.DeliveryTime == 1) time = "Anytime";
+                            else time = "Office hours only";
+                            list.Add(new OrderView()
+                            {
+                                Id = i.Id,
+                                Status = i.Status,
+                                Total = i.Total,
+                                Note = i.Note,
+                                Check = i.Check,
+                                CheckedAt = i.CheckedAt,
+                                CheckedBy = i.CheckedBy,
+                                CheckedComment = i.CheckedComment,
+                                UserId = i.UserId,
+                                list = details,
+                                address = address,
+                                Time = time,
+                                Payment = payment
+                            });
+                            //var orderView = await GetOrderById(i.Id);
+                            //foreach(OrderView j in orderView)
+                            //    list.Add(j);
+                        }
+                        else
+                        {
+                            List<AddressView> address = await _addressService.GetAddressById((int)i.AddressId);
+                            if (i.PaymentMethod == PaymentMethod.Online) payment = "Banking";
+                            else payment = "COD";
+                            if (i.DeliveryTime == 1) time = "Anytime";
+                            else time = "Office hours only";
+                            list.Add(new OrderView()
+                            {
+                                Id = i.Id,
+                                Status = i.Status,
+                                Total = i.Total,
+                                Note = i.Note,
+                                Check = i.Check,
+                                CheckedAt = i.CheckedAt,
+                                CheckedBy = i.CheckedBy,
+                                CheckedComment = i.CheckedComment,
+                                UserId = i.UserId,
+                                list = null,
+                                address = address,
+                                Time = time,
+                                Payment = payment
+                            });
+                        }
                     }
                 }
                 return await Task.FromResult(list);
