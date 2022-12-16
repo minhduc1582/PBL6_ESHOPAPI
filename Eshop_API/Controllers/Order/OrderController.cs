@@ -13,7 +13,7 @@ using eshop_pbl6.Helpers.Identities;
 using System.IdentityModel.Tokens.Jwt;
 using Eshop_API.Services.VNPAY;
 using Eshop_API.Models.DTO.VNPAY;
-using Eshop_API.Helpers.Order;
+using Eshop_API.Helpers.Orders;
 
 namespace eshop_api.Controllers.Products
 {
@@ -182,10 +182,10 @@ namespace eshop_api.Controllers.Products
             }
         }
         [HttpPut("change-status")]
-        public async Task<IActionResult> ChangeStatus(Guid idOrder, int status)
+        public async Task<IActionResult> ChangeStatus(List<Guid> idOrder, int status, string note)
         {
             try{
-                var result = await _orderService.ChangeStatus(idOrder, status);
+                var result = await _orderService.ChangeStatus(idOrder, status, note);
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "cập nhật dữ liệu thành công", result));
             }
             catch(Exception ex)

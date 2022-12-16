@@ -32,6 +32,7 @@ using Eshop_API;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using eshop_pbl6.Helpers.Common;
+using Eshop_API.Helpers.Profiles;
 
 var builder = WebApplication.CreateBuilder(args);
 // configur log
@@ -126,6 +127,7 @@ services.AddTransient<IOrderService, OderService>();
 services.AddTransient<IOderDetailService, OderDetailService>();
 services.AddTransient<IAddressService, AddressService>();
 services.AddTransient<IVnPayService, VnPayService>();
+services.AddAutoMapper(typeof(MapperProfiles).Assembly);
 #endregion
 
 #region Repositories
