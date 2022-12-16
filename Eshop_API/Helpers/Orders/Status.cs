@@ -1,4 +1,4 @@
-namespace eshop_pbl6.Helpers.Order
+namespace eshop_pbl6.Helpers.Orders
 {
     public enum Status
     {

@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using Eshop_API.Helpers.Order;
+using Eshop_API.Helpers.Orders;
 
 namespace eshop_api.Entities
 {
