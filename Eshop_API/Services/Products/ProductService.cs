@@ -67,7 +67,7 @@ namespace eshop_api.Service.Products
 
         public async Task<List<ProductDto>> GetListProduct(int sortOrder)
         {
-            var products = _context.Products.ToList();
+            var products = _context.Products.Where(p => p.Status == Status.Approved).ToList();
             var imgaes = _context.Images.ToList();
             if(sortOrder!=0)
             {
@@ -91,21 +91,6 @@ namespace eshop_api.Service.Products
                 productDto.ImageUrl = imgaes.Where(x => x.ProductID == item.Id).Select(x => x.Url).ToList();
                 productDtos.Add(productDto);
             }
-            var lstProduct = from product in _context.Products
-                    select new ProductDto{
-                        Id = product.Id,
-                        Code = product.Code,
-                        Name = product.Name,
-                        Keyword = product.Keyword,
-                        AvtImageUrl = product.AvtImageUrl,
-                        Price = product.Price,
-                        Discount = (double)product.Discount,
-                        Weight = product.Weight,
-                        Description = product.Description,
-                        Color = product.Color,
-                        ImageUrl = _context.Images.Where(y => y.ProductID == product.Id).Select(s => s.Url).ToList()
-                    };
-            
             return await Task.FromResult(productDtos);
         }
 

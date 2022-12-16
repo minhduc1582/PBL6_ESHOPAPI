@@ -10,20 +10,20 @@ namespace eshop_api.Models.DTO.Order
 {
     public class CreateUpdateOrder
     {
-        [Required]
+        [Required(ErrorMessage = "Danh sách sản phẩm không được bỏ trống")]
         public List<OrderDetailDTO> listProduct {get; set;}
-        [Required]
+        [Required(ErrorMessage = "Giá không được bỏ trống")]
         [DisplayName("Price")]
-        [RegularExpression(@"^\$?\d+(\.(\d{2}))?$",ErrorMessage = "Price is not valid")]
-        [Range(0.000001,double.MaxValue, ErrorMessage = "Price greater than 0")]
+        [Range(0.000001,double.MaxValue, ErrorMessage = "Giá phải lớn hơn 0")]
         public double Total { get; set; }
         public string Note { get; set; }
         public string Check { get; set; }
+        [DataType(DataType.Date,ErrorMessage = "CheckedAt không đúng định ngày")]
         public DateTime CheckedAt { get; set; }
+        [DataType(DataType.Date,ErrorMessage = "CheckedAt không đúng định ngày")]
         public DateTime CreateAt {get;set;}
         public string CheckedBy { get; set; }
         public string CheckedComment { get; set; }
-        [Required]
         public int UserId { get; set; }
     }
 }

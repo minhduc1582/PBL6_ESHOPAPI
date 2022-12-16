@@ -22,12 +22,12 @@ namespace eshop_pbl6.Authorization
         public async Task Invoke(HttpContext context, IUserService userService, IJwtUtils jwtUtils)
         {
             var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
-            var username = jwtUtils.ValidateJwtToken(token);
-            if (username != null)
+            string idUser = jwtUtils.ValidateJwtToken(token);
+            if (!string.IsNullOrEmpty(idUser))
             {
                 // attach user to context on successful jwt validation
                 //context.Items["User"] = await userService.GetByUserName(username);
-                context.Items["Permissions"] = await userService.GetPermissionByUser(username);
+                context.Items["Permissions"] = await userService.GetPermissionByUser(int.Parse(idUser));
             }
 
             await _next(context);

@@ -68,10 +68,10 @@ namespace eshop_pbl6.Authorization
                 }, out SecurityToken validatedToken);
 
                 var jwtToken = (JwtSecurityToken)validatedToken;
-                var username = jwtToken.Claims.First(x => x.Type == "nameid").Value;
+                var idUser = jwtToken.Claims.First(x => x.Type == "Id").Value;
 
                 // return user id from JWT token if validation successful
-                return username;
+                return idUser;
             }
             catch
             {

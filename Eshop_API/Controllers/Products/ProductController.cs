@@ -40,7 +40,6 @@ namespace eshop_api.Controllers.Products
         [HttpGet("get-list-product")]
         public async Task<ActionResult> GetListProduct([FromQuery]PagedAndSortedResultRequestDto input, int sortOrder){
                 var childSpan = _sentryHub.GetSpan()?.StartChild("additional-work");
-
             try{
                  _logger.LogInformation("GetListProduct Get - Begin Get list", DateTime.UtcNow);
                 var result = await _productService.GetListProduct(sortOrder);
@@ -63,20 +62,6 @@ namespace eshop_api.Controllers.Products
         public async Task<ActionResult>  GetListProductByIdCategory([FromQuery]PagedAndSortedResultRequestDto input, int idCategory, int sortOrder){
             try{
                 var result = await _productService.GetProductsByIdCategory(idCategory, sortOrder);
-                result.Where(x => input.Filter == "" || input.Filter == null || x.Name == input.Filter);
-                var page_list  = PagedList<ProductDto>.ToPagedList(result.OrderBy(on => on.Name),
-                        input.PageNumber,
-                        input.PageSize);
-                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,"get dữ liệu thành công",page_list) );
-            }
-            catch(Exception ex){
-                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,ex.Message,"null") );
-            }
-        }
-        [HttpGet("get-list-product-by-id")]
-        public async Task<ActionResult>  GetListProductById([FromQuery]PagedAndSortedResultRequestDto input, int idProduct){
-            try{
-                var result = await _productService.GetProductsById(idProduct);
                 result.Where(x => input.Filter == "" || input.Filter == null || x.Name == input.Filter);
                 var page_list  = PagedList<ProductDto>.ToPagedList(result.OrderBy(on => on.Name),
                         input.PageNumber,

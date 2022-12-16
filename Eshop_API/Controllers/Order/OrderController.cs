@@ -52,6 +52,7 @@ namespace eshop_api.Controllers.Products
             }
         }
         [HttpGet("get-order-by-id")]
+        [Authorize(EshopPermissions.OrderPermissions.Get)]
         public IActionResult GetOrderById(Guid idOrder)
         {
             try{
@@ -64,6 +65,7 @@ namespace eshop_api.Controllers.Products
             }
         }
         [HttpGet("get-order-by-status")]
+        [Authorize(EshopPermissions.OrderPermissions.GetList)]
         public IActionResult GetOrdersByStatus(int status)
         {
             try{
@@ -76,10 +78,15 @@ namespace eshop_api.Controllers.Products
             }
         }
         [HttpGet("get-order-by-status-of-each-user")]
-        public IActionResult GetOrderByStatusOfEachUser(int userId, int status)
+        [Authorize(EshopPermissions.OrderPermissions.Get)]
+        public IActionResult GetOrderByStatusOfEachUser(int status)
         {
             try{
-                var result = _orderService.GetOrderByStatusOfEachUser(userId, status);
+                var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                var handler = new JwtSecurityTokenHandler();
+                var jwtSecurityToken = handler.ReadJwtToken(token);
+                string idUser = jwtSecurityToken.Claims.First(claim => claim.Type == "Id").Value;
+                var result = _orderService.GetOrderByStatusOfEachUser(int.Parse(idUser), status);
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "lấy dữ liệu thành công", result));
             }
             catch(Exception ex)
@@ -97,11 +104,11 @@ namespace eshop_api.Controllers.Products
                 var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
                 var handler = new JwtSecurityTokenHandler();
                 var jwtSecurityToken = handler.ReadJwtToken(token);
-                var username = jwtSecurityToken.Claims.First(claim => claim.Type == "nameid").Value;
+                string idUser = jwtSecurityToken.Claims.First(claim => claim.Type == "Id").Value;
                 // var claimsIdentity = (ClaimsIdentity)User.Identity;
                 // var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
                 // int userId = Convert.ToInt32(claim.Value);
-                var result = await _orderService.AddOrder(orderDetailDTO, username, idAddress, payment, time,remoteIpAddress);
+                var result = await _orderService.AddOrder(orderDetailDTO, int.Parse(idUser), idAddress, payment, time,remoteIpAddress);
                 //result.Id
                 
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "thêm dữ liệu thành công", result));
@@ -162,11 +169,11 @@ namespace eshop_api.Controllers.Products
                 var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
                 var handler = new JwtSecurityTokenHandler();
                 var jwtSecurityToken = handler.ReadJwtToken(token);
-                var username = jwtSecurityToken.Claims.First(claim => claim.Type == "nameid").Value;
+                var idUser = jwtSecurityToken.Claims.First(claim => claim.Type == "Id").Value;
                 // var claimsIdentity = (ClaimsIdentity)User.Identity;
                 // var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
                 // int userId = Convert.ToInt32(claim.Value);
-                var result = await _orderService.DelFromCart(idProduct, username, quantity);
+                var result = await _orderService.DelFromCart(idProduct, int.Parse(idUser), quantity);
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "xóa dữ liệu thành công", result));
             }
             catch(Exception ex)

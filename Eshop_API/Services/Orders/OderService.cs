@@ -35,20 +35,19 @@ namespace eshop_api.Services.Orders
             _vnPayService = vnPayService;
         }
         
-        public async Task<OrderDto> AddOrder(List<OrderDetailDTO> orderDetailDTOs, string username, int idAddress, PaymentMethod payment, int time,string ipaddr)
+        public async Task<OrderDto> AddOrder(List<OrderDetailDTO> orderDetailDTOs, int idUser, int idAddress, PaymentMethod payment, int time,string ipaddr)
         {
-            var user = _context.AppUsers.FirstOrDefault(x => x.Username == username);
             double temp = 0;
             foreach(OrderDetailDTO i in orderDetailDTOs)
             {
                 var product = _context.Products.FirstOrDefault(x=> x.Id == i.ProductId);
                 temp += i.Quantity * product.Price;
-                await DelFromCart(i.ProductId, username, i.Quantity);
+                await DelFromCart(i.ProductId, idUser, i.Quantity);
             }
             Order order = new Order();
             order.Status = Status.Pending.ToString();
             order.Total = temp;
-            order.UserId = user.Id;
+            order.UserId = idUser;
             order.AddressId = idAddress;
             order.PaymentMethod = payment;
             order.DeliveryTime = time;
@@ -63,6 +62,7 @@ namespace eshop_api.Services.Orders
             var jsonOrder = JsonConvert.SerializeObject(result);
             var orderDto = JsonConvert.DeserializeObject<OrderDto>(jsonOrder);
             if(payment == PaymentMethod.Online){
+                var user = _context.AppUsers.FirstOrDefault(x => x.Id == idUser);
                 ModelPayDto modalPayDto = new ModelPayDto{
                     Amount = result.Total,
                     Email = user.Email,
@@ -201,10 +201,9 @@ namespace eshop_api.Services.Orders
             return false;
         }
 
-        public async Task<Order> DelFromCart(int idProduct, string username, int quantity)
+        public async Task<Order> DelFromCart(int idProduct, int idUser, int quantity)
         {
-            int userId = _context.AppUsers.FirstOrDefault(x => x.Username == username).Id;
-            List<Order> order = GetOrderByStatusOfEachUser(userId, 1).ToList();
+            List<Order> order = GetOrderByStatusOfEachUser(idUser, 1).ToList();
             foreach(Order i in order)
             {
                 List<OrderDetail> orderDetails = _orderDetailService.GetOrderDetailsByOrderId(i.Id).ToList();

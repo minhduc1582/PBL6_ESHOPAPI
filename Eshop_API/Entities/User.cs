@@ -34,7 +34,7 @@ namespace eshop_api.Entities
         public string Phone { get; set; }
         public string AvatarUrl { get; set; }
         public DateTime BirthDay { get; set; }
-        public GenderEnum Gender { get; set; }
+        public GenderEnum? Gender { get; set; }
         [ForeignKey("Role")]
         public int RoleId{get;set;}
         [JsonIgnore]

@@ -67,8 +67,8 @@ namespace Eshop_API.Controllers.Address
                 var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
                 var handler = new JwtSecurityTokenHandler();
                 var jwtSecurityToken = handler.ReadJwtToken(token);
-                var username = jwtSecurityToken.Claims.First(claim => claim.Type == "nameid").Value;
-                var result = _addressService.GetListAddressByUser(username);
+                var idUser = jwtSecurityToken.Claims.First(claim => claim.Type == "Id").Value;
+                var result = _addressService.GetListAddressByUser(int.Parse(idUser));
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "lấy dữ liệu thành công", result));
             }
             catch (Exception ex)
@@ -97,9 +97,8 @@ namespace Eshop_API.Controllers.Address
                 var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
                 var handler = new JwtSecurityTokenHandler();
                 var jwtSecurityToken = handler.ReadJwtToken(token);
-                var username = jwtSecurityToken.Claims.First(claim => claim.Type == "nameid").Value;
-                var result = await _addressService.AddAddress(createUpdateAddress, username);
-                int i = 0;
+                var idUser = jwtSecurityToken.Claims.First(claim => claim.Type == "Id").Value;
+                var result = await _addressService.AddAddress(createUpdateAddress, int.Parse(idUser));
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "lấy dữ liệu thành công", result));
             }
 

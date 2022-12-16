@@ -46,18 +46,18 @@ namespace eshop_pbl6.Services.Identities
             return await Task.FromResult(roleDtos);
         }
 
-        public async Task<User> GetByUserName(string username)
+        public async Task<User> GetById(int idUser)
         {
-            return await Task.FromResult(_context.AppUsers.FirstOrDefault(x => x.Username.ToLower() == username.ToLower().Trim()));
+            return await Task.FromResult(_context.AppUsers.FirstOrDefault(x => x.Id == idUser));
         }
 
-        public async Task<List<string>> GetPermissionByUser(string username)
+        public async Task<List<string>> GetPermissionByUser(int idUser)
         {
             var role = (from us in _context.AppUsers
                         join r in _context.Roles on us.RoleId equals r.Id
                         join rip in _context.RoleInPermissions on r.Id equals rip.RoleId
                         join p in _context.Permissions on rip.PermissionId equals p.Id
-                        where (us.Username == username)
+                        where (us.Id == idUser)
                         select (p.name)).ToList();
             if (role != null)
             {
@@ -101,10 +101,10 @@ namespace eshop_pbl6.Services.Identities
             throw new NotImplementedException();
         }
 
-        public async Task<UserDto> UpdateUserById(UpdateUserDto userDto,string username)
+        public async Task<UserDto> UpdateUserById(UpdateUserDto userDto,int idUser)
         {
             try{
-                var user = _context.AppUsers.FirstOrDefault(x => x.Username == username);
+                var user = _context.AppUsers.FirstOrDefault(x => x.Id == idUser);
                 if(user != null){
                     user.Phone  = userDto.Phone;
                     user.BirthDay = userDto.BirthDay;
