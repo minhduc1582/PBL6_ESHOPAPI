@@ -8,30 +8,31 @@ namespace eshop_api.Models.DTO.Products
 {
     public class CreateUpdateProductDto
     {
-        [Required]
+        [Required(ErrorMessage = "Tên sản phẩm không được bỏ trống")]
+        [MaxLength(512,ErrorMessage = "Độ dài của tên phải bé hơn 512 ký tự")]
         public string Name{get;set;}
         public string Keyword{get;set;}
-        [Required]
-        [DataType(DataType.Upload)]
-        [FileExtensions(Extensions ="jpg,png,gif,jpeg,bmp,svg")]
+        [Required(ErrorMessage = "Ảnh product đại diện không được bỏ trống")]
+        [DataType(DataType.Upload,ErrorMessage = "Ảnh không đúng định dạng")]
+        [FileExtensions(Extensions ="jpg,png,gif,jpeg,bmp,svg",ErrorMessage = "Ảnh không đúng định dạng")]
         public IFormFile AvtImage{get;set;}
         [Required]
-        [Range(0.000001,double.MaxValue, ErrorMessage = "Price greater than 0 VND")]
+        [Range(1,double.MaxValue, ErrorMessage = "giá không được thấp hơn hăọc bằng 0 VND")]
         public double Price{get;set;}
-        [Range(0,100, ErrorMessage = "Discount is from 0 to 100 percent")]
+        [Range(0,100, ErrorMessage = "Discount phải từ 0 đến 100%")]
         public double Discount{get;set;}
-        [Range(0.000001,int.MaxValue)]
+        [Range(1,int.MaxValue)]
         public int ImportQuantity{get;set;} // Số lượng nhập kho
-        [Range(0,10, ErrorMessage = "Weight is from 0 to 10kg")]
+        [Range(0,10, ErrorMessage = "Cân nặng phải từ 0 đến 10kg")]
         public float Weight{get;set;}
         public string Description{get;set;}
         [MaxLength(20)]
         public string Color{get;set;}
-        [RegularExpression("{('\\w+':(\\d+|'\\w+'|true|false|null))+}\\]",ErrorMessage = "Not Right Format Json")]
+        [RegularExpression("{('\\w+':(\\d+|'\\w+'|true|false|null))+}\\]",ErrorMessage = "không đúng format json")]
         public Dictionary<string, object> Detail{get;set;}
         [Required]
-        [DataType(DataType.Upload)]
-        [FileExtensions(Extensions ="jpg,png,gif,jpeg,bmp,svg")]
+        [DataType(DataType.Upload,ErrorMessage = "Ảnh không đúng định dạng")]
+        [FileExtensions(Extensions ="jpg,png,gif,jpeg,bmp,svg",ErrorMessage = "Ảnh không đúng định dạng")]
         public IFormFileCollection ProductImages{get;set;}
         [Required]
         public int IdCategory{get;set;}

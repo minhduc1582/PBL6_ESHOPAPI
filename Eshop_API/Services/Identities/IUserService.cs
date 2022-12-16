@@ -14,10 +14,10 @@ namespace eshop_pbl6.Services.Identities
         Task<UserDto> GetUsersDto();
         Task<User> Register(CreateUpdateUserDto create);
         Task<bool> Login(UserLogin userLogin);
-        Task<User> GetByUserName(string username);
-        Task<UserDto> UpdateUserById(UpdateUserDto userDto,string username);
+        Task<User> GetById(int idUser);
+        Task<UserDto> UpdateUserById(UpdateUserDto userDto,int idUser);
         Task<bool> ChangePassword(string passwordOld,string passwordNew);
-        Task<List<string>> GetPermissionByUser(string username);
+        Task<List<string>> GetPermissionByUser(int idUser);
         Task<List<Permission>> GetAllPermission();
         Task<List<RoleDto>> GetAllRoles();
         Task<bool> ChangePassworrd(string username,string passwordOld, string passwordNew);

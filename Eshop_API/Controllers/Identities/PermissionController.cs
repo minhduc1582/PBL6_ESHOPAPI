@@ -49,23 +49,23 @@ namespace eshop_pbl6.Controllers.Identities
             }
             
         }
-        [Authorize(EshopPermissions.ManagerPermissions.Get)]
-        [HttpGet("get-permissions-by-username")]
-        public IActionResult GetPermissionByUserName(string username)
-        {
-            try
-            {
-                var result = _userService.GetPermissionByUser(username);
-                if(result != null){
-                    return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,"Get dữ liệu thành công",result));
-                }
-                return Ok(CommonReponse.CreateResponse(ResponseCodes.ErrorData,"Get dữ liệu không thành công","null"));
-            }
-            catch (Exception ex)
-            {
-                 return Ok(CommonReponse.CreateResponse(ResponseCodes.ErrorException,ex.Message,"null"));
-            }
+        // [Authorize(EshopPermissions.ManagerPermissions.Get)]
+        // [HttpGet("get-permissions-by-username")]
+        // public IActionResult GetPermissionByUserName(string username)
+        // {
+        //     try
+        //     {
+        //         var result = _userService.GetPermissionByUser(username);
+        //         if(result != null){
+        //             return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,"Get dữ liệu thành công",result));
+        //         }
+        //         return Ok(CommonReponse.CreateResponse(ResponseCodes.ErrorData,"Get dữ liệu không thành công","null"));
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //          return Ok(CommonReponse.CreateResponse(ResponseCodes.ErrorException,ex.Message,"null"));
+        //     }
             
-        }
+        // }
     }
 }
