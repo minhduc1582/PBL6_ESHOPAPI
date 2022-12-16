@@ -56,6 +56,8 @@ namespace Eshop_API.Services.VNPAY
             object result;
             if (checkSignature)
             {
+                var checkBill = await _billPaymentRepository.FirstOrDefault(x => x.TnxRef == orderId);
+                //if(checkBill != null && checkBill.Status == PaymentStatus.Success) return;
                 var order = await _orderRepository.FirstOrDefault(x => x.Id == orderId);
                 BillPay billPay = new BillPay{
                     TnxRef = order.Id,

@@ -25,17 +25,13 @@ namespace eshop_api.Entities
         [Required]
         [StringLength(255),EmailAddress]
         public string Email { get; set; }
-        public string Code { get; set; }
         [JsonIgnore]
         public byte[] PasswordHash { get; set; }
         [JsonIgnore]
         public byte[] PasswordSalt { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string Phone1 { get; set; }
-        public string Phone2 { get; set; }
-        public string Address1 { get; set; }
-        public string Address2 { get; set; }
+        public string Phone { get; set; }
         public string AvatarUrl { get; set; }
         public DateTime BirthDay { get; set; }
         public GenderEnum Gender { get; set; }
