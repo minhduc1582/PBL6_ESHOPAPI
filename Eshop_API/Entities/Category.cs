@@ -16,6 +16,7 @@ namespace eshop_api.Entities
         public int Id{get;set;}
         #nullable enable
         public string? Code{get;set;}
+        public int level{get;set;}
         public string Name{get;set;}
         public int? ParentId{get;set;}
         public virtual List<Product> Products{get;set;}

@@ -30,11 +30,10 @@ namespace eshop_pbl6.Services.Addresses
             return _context.Comunities.Where(x => x.DistrictId == idDistrict).ToList();
         }
 
-        public List<AddressView> GetListAddressByUser(string username)
+        public List<AddressView> GetListAddressByUser(int idUser)
         {
-            int userId = _context.AppUsers.FirstOrDefault(x => x.Username == username).Id;
             List<AddressView> addresses = new List<AddressView>();
-            List<Address> list = _context.Addresses.Where(x => x.UserId == userId).ToList();
+            List<Address> list = _context.Addresses.Where(x => x.UserId == idUser).ToList();
             foreach(Address i in list)
             {
                 addresses.Add(new AddressView
@@ -70,14 +69,13 @@ namespace eshop_pbl6.Services.Addresses
             return await Task.FromResult(addresses);
         }
 
-        public async Task<Address> AddAddress(CreateUpdateAddress createUpdateAddress, string username)
+        public async Task<Address> AddAddress(CreateUpdateAddress createUpdateAddress, int idUser)
         {
-            int userId = _context.AppUsers.FirstOrDefault(x => x.Username == username).Id;
             int provinceId = _context.Provinces.FirstOrDefault(x => x.Name == createUpdateAddress.ProvinceName).Id;
             int districtId = _context.Dictricts.FirstOrDefault(x => x.Name == createUpdateAddress.DistrictName).Id;
             int communityId = _context.Comunities.FirstOrDefault(x => x.Name == createUpdateAddress.CommunityName).Id;
             Address address = new Address();
-            address.UserId = userId;
+            address.UserId = idUser;
             address.Phone = createUpdateAddress.Phone;
             address.ProvinceId = provinceId;
             address.DistrictId = districtId;

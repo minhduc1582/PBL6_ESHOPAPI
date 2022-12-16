@@ -8,8 +8,8 @@ namespace eshop_api.Models.DTO.Products
 {
     public class CreateUpdateCategory
     {
-        [Required]
-        [MaxLength(30)]
+        [Required(ErrorMessage ="Tên danh mục không được bỏ trống")]
+        [MaxLength(30,ErrorMessage = "Độ dài của tên phải bé hơn 30 ký tự")]
         public string Name{get;set;}
         public int ParentId{get;set;}
     }

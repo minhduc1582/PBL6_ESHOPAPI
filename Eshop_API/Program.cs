@@ -29,6 +29,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using System;
 using Eshop_API;
+using System.Net;
+using Microsoft.AspNetCore.Mvc;
+using eshop_pbl6.Helpers.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 // configur log
@@ -153,7 +156,26 @@ services.AddCors(o =>
 // add elastic search
 services.AddElasticsearch(builder.Configuration);
 
-
+// Edit reponse annotation
+services.AddMvcCore().ConfigureApiBehaviorOptions(options => {
+            options.InvalidModelStateResponseFactory = (errorContext) =>
+            {
+                var errors = errorContext.ModelState.Values.SelectMany(e => e.Errors.Select(m => new
+                {
+                    ErrorMessage = m.ErrorMessage
+                })).ToList();
+                // var result = new
+                // {
+                //     Metadata = new
+                //     {
+                //         Code = (int)HttpStatusCode.BadRequest,
+                //         Message = errors.Select(e => e.ErrorMessage).ToList()
+                //     }
+                // };
+                string messageError = string.Join( "| ", errors.Select(e => e.ErrorMessage).ToList());
+                return new OkObjectResult(CommonReponse.CreateResponse(ResponseCodes.BadRequest,messageError,null));
+            };
+        });
 
 var app = builder.Build();
 // tracing sentry

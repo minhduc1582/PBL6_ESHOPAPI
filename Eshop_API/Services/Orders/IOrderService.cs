@@ -16,13 +16,13 @@ namespace eshop_api.Services.Orders
         List<Order> GetOrdersByUserId(int userId); //Lấy đơn hàng theo user id
         List<Order> GetOrdersByStatus(int status); // Lấy đơn hàng theo trạng thái
         List <Order> GetOrderByStatusOfEachUser(int userId, int status); // Lấy đơn hàng theo trạng thái của mỗi người dùng
-        Task<OrderDto> AddOrder(List<OrderDetailDTO> orderDetailDTOs, string username, int idAddress, PaymentMethod payment, int time,string ipAddrV4); // Thêm đơn hàng
+        Task<OrderDto> AddOrder(List<OrderDetailDTO> orderDetailDTOs, int idUser, int idAddress, PaymentMethod payment, int time,string ipAddrV4); // Thêm đơn hàng
         Task<Order> UpdateOrder(CreateUpdateOrder createUpdateOrder, Guid idOrder); //Sửa đơn hàng
         Task<Order> ChangeStatus(Guid idOrder, int status); // đổi trạng thái
         Task<bool> DeleteOrderById(Guid idOrder); //Xóa đơn hàng theo id
         Task<bool> UpdateTotal(Guid idOrder); //Cập nhật tổng tiền giỏ hàng
         Task<Order> AddToCart(OrderDetailDTO orderDetailDTOs, string username); //Thêm vào giỏ hàng
-        Task<Order> DelFromCart(int idProduct, string username, int quantity); //Xóa khỏi giỏ hàng
+        Task<Order> DelFromCart(int idProduct, int idUser, int quantity); //Xóa khỏi giỏ hàng
         
 
     }

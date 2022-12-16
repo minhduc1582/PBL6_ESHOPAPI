@@ -24,6 +24,7 @@ namespace eshop_pbl6.Helpers.Identities
             public const string Add = Default + ".Add";
             public const string Edit = Default + ".Edit";
             public const string Delete = Default + ".Delete";
+            public const string GetList = Default + ".GetList";
         }
         public static class UserPermissions
         {

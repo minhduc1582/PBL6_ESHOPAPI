@@ -138,8 +138,8 @@ namespace eshop_pbl6.Controllers.Identities
                 var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
                 var handler = new JwtSecurityTokenHandler();
                 var jwtSecurityToken = handler.ReadJwtToken(token);
-                var username = jwtSecurityToken.Claims.First(claim => claim.Type == "nameid").Value;
-                var result = await _userService.GetByUserName(username);
+                var idUser = jwtSecurityToken.Claims.First(claim => claim.Type == "Id").Value;
+                var result = await _userService.GetById(int.Parse(idUser));
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "Lấy dữ liệu thành công",result));
             }
             catch(Exception  ex){
@@ -154,8 +154,8 @@ namespace eshop_pbl6.Controllers.Identities
                 var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
                 var handler = new JwtSecurityTokenHandler();
                 var jwtSecurityToken = handler.ReadJwtToken(token);
-                var username = jwtSecurityToken.Claims.First(claim => claim.Type == "nameid").Value;
-                var result = await _userService.UpdateUserById(userDto,username);
+                var idUser = jwtSecurityToken.Claims.First(claim => claim.Type == "Id").Value;
+                var result = await _userService.UpdateUserById(userDto,int.Parse(idUser));
                 if(result != null){
                     return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "Thay đổi thông tin cá nhân thành công",result));
                 }
