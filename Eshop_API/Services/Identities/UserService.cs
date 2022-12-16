@@ -76,7 +76,7 @@ namespace eshop_pbl6.Services.Identities
             throw new NotImplementedException();
         }
 
-        public async Task<User> Register(CreateUpdateUser create)
+        public async Task<User> Register(CreateUpdateUserDto create)
         {
             throw new NotImplementedException();
         }
@@ -106,10 +106,7 @@ namespace eshop_pbl6.Services.Identities
             try{
                 var user = _context.AppUsers.FirstOrDefault(x => x.Username == username);
                 if(user != null){
-                    user.Phone1  = userDto.Phone1;
-                    user.Phone2  = userDto.Phone2;
-                    user.Address1  = userDto.Address1;
-                    user.Address2 = userDto.Address2;
+                    user.Phone  = userDto.Phone;
                     user.BirthDay = userDto.BirthDay;
                     user.Email = userDto.Email;
                     user.FirstName  = userDto.FirstName;

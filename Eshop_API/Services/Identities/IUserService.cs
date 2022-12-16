@@ -12,7 +12,7 @@ namespace eshop_pbl6.Services.Identities
     public interface IUserService
     {
         Task<UserDto> GetUsersDto();
-        Task<User> Register(CreateUpdateUser create);
+        Task<User> Register(CreateUpdateUserDto create);
         Task<bool> Login(UserLogin userLogin);
         Task<User> GetByUserName(string username);
         Task<UserDto> UpdateUserById(UpdateUserDto userDto,string username);

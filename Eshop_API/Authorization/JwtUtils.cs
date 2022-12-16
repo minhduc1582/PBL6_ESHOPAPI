@@ -23,18 +23,14 @@ namespace eshop_pbl6.Authorization
         public string GenerateJwtToken(User user)
         {
             var claims = new List<Claim>(){
+                new Claim("Id", user?.Id.ToString() ?? ""),
                 new Claim(JwtRegisteredClaimNames.NameId, user.Username),
-                new Claim("FirstName", user.FirstName ?? ""),
-                new Claim("LastName", user.LastName ?? ""),
-                new Claim("Code", user.Code ?? ""),
-                new Claim("Phone1", user.Phone1 ?? ""),
-                new Claim("Address1", user.Address1 ?? ""),
-                new Claim("Phone2", user.Phone2 ?? ""),
-                new Claim("Address2", user.Address2 ?? ""),
-                new Claim("AvatarUrl", user.AvatarUrl ?? ""),
-                new Claim(JwtRegisteredClaimNames.Gender, user.Gender.ToString() ?? ""),
-                new Claim(JwtRegisteredClaimNames.Birthdate, user.BirthDay.ToString() ?? ""),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email)
+                new Claim("FirstName", user?.FirstName ?? ""),
+                new Claim("LastName", user?.LastName ?? ""),
+                new Claim("AvatarUrl", user?.AvatarUrl ?? ""),
+                new Claim(JwtRegisteredClaimNames.Gender, user?.Gender.ToString() ?? ""),
+                new Claim(JwtRegisteredClaimNames.Birthdate, user?.BirthDay.ToString() ?? ""),
+                new Claim(JwtRegisteredClaimNames.Email, user?.Email)
             };
             var symetrickey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(_configuration["TokenKey"])

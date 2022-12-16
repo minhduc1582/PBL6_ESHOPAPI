@@ -19,6 +19,7 @@ namespace eshop_api.Entities
         public string PayDate{get;set;}
         public string OrderInfo{get;set;}
         public string BankCode{get;set;}
+        [Required]
         public PaymentStatus Status{get;set;} // watting,
         [JsonIgnore]
         public virtual Order Order {get;set;}

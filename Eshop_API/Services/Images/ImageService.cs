@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using eshop_api.Entities;
 using eshop_api.Helpers;
 using eshop_api.Models.DTO.Images;
+using Eshop_API.Models.DTO.Images;
 
 namespace eshop_api.Services.Images
 {
@@ -15,7 +16,7 @@ namespace eshop_api.Services.Images
         public ImageService(DataContext context){
             _context = context;
         }
-        public async Task<Image> AddImage(CreateUpdateImageDto createImage)
+        public async Task<Image> AddImage(CreateImageDto createImage)
         {
             Image image = new Image();
             if(createImage.Name == null || createImage.Name == "")
@@ -59,7 +60,7 @@ namespace eshop_api.Services.Images
             return Task.FromResult(image);
         }
 
-        public async Task<Image> UpdateImage(CreateUpdateImageDto updateImage)
+        public async Task<Image> UpdateImage(UpdateImageDto updateImage)
         {
             Image image = _context.Images.FirstOrDefault(x => x.Id == updateImage.Id);
             if(updateImage.Name == null || updateImage.Name == "")
