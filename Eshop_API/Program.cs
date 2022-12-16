@@ -3,7 +3,6 @@ using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using eshop_api.Services.Identities;
 using eshop_api.Helpers;
 using eshop_api.Service.Products;
 using eshop_api.Services.Products;
@@ -115,7 +114,6 @@ services.AddDbContext<DataContext>(
 
 // Add Depedency
 #region Services
-services.AddScoped<ITokenService, TokenService>();
 services.AddScoped<IProductService, ProductService>();
 services.AddScoped<ICategoryService, CategoryService>();
 services.AddScoped<IImageService, ImageService>();

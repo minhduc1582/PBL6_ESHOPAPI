@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
 using System.Text;
-using eshop_api.Services.Identities;
 using eshop_api.Models.DTO;
 using eshop_api.Entities;
 using eshop_api.Helpers;
@@ -17,25 +16,27 @@ using eshop_api.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using eshop_pbl6.Services.Identities;
 using System.Text.Json;
+using eshop_pbl6.Authorization;
 
 namespace eshop_pbl6.Controllers.Identities
 {
     public class IdentityController : BaseController
     {
         private readonly DataContext _context;
-        private readonly ITokenService _tokenService;
         private readonly IUserService _userService;
+        private readonly IJwtUtils _jwtUtils;
 
         public IdentityController(DataContext context,
-            ITokenService tokenService,
-            IUserService userService)
+            IUserService userService,
+            IJwtUtils jwtUtils)
         {
             _context = context;
-            _tokenService = tokenService;
+
             _userService = userService;
+            _jwtUtils = jwtUtils;
         }
         [HttpPost("register")]
-        public IActionResult Register([FromBody] CreateUpdateUser create)
+        public IActionResult Register([FromBody] CreateUpdateUserDto create)
         {
             create.Username = create.Username.ToLower();
             Result result = new Result();
@@ -55,8 +56,7 @@ namespace eshop_pbl6.Controllers.Identities
                 PasswordHash = hmac.ComputeHash(passwordBytes),
                 FirstName = create.FirstName,
                 LastName = create.LastName,
-                Phone1 = create.Phone1,
-                Address1 = create.Address1,
+                Phone = create.Phone,
                 BirthDay = create.BirthDay,
                 Gender = create.Gender,
                 AvatarUrl = create.Avatar != null ? CloudImage.UploadImage(create.Avatar) : "",
@@ -66,7 +66,7 @@ namespace eshop_pbl6.Controllers.Identities
 
             var userResult = _context.AppUsers.Add(newUser);
             _context.SaveChanges();
-            var token = _tokenService.CreateToken(userResult.Entity);
+            var token = _jwtUtils.GenerateJwtToken(userResult.Entity);
             result.Results.Add("Token", token);
             result.Results["Success"] = true;
             return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "Đăng kí thành công", result));
@@ -95,7 +95,7 @@ namespace eshop_pbl6.Controllers.Identities
                         return Ok(CommonReponse.CreateResponse(ResponseCodes.Unauthorized, "Tài khoản hoặc mật khẩu không trùng khớp", result));
                     }
                 }
-                var token = _tokenService.CreateToken(currentUser);
+                var token = _jwtUtils.GenerateJwtToken(currentUser);
                 result.Results.Add("Token", token);
                 result.Results["Success"] = true;
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "Đăng nhập thành công", result));
@@ -149,7 +149,7 @@ namespace eshop_pbl6.Controllers.Identities
         }
         [HttpPut("change-profile")]
         [Authorize(EshopPermissions.UserPermissions.Edit)]
-        public async Task<IActionResult> ChangeProfile(UpdateUserDto userDto){
+        public async Task<IActionResult> ChangeProfile([FromForm] UpdateUserDto userDto){
             try{
                 var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
                 var handler = new JwtSecurityTokenHandler();

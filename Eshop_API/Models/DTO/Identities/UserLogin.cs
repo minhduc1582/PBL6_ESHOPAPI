@@ -9,11 +9,12 @@ namespace eshop_pbl6.Models.DTO.Identities
     public class UserLogin
     {
         [Required]
-        [MaxLength(256)]
+        [MaxLength(30)]
         public string Username {get; set;}
 
         [Required]
-        [MaxLength(256)]
+        [MaxLength(60)]
+        [DataType(DataType.Password)]
         public string Password {get; set;}
     }
 }

@@ -18,8 +18,8 @@ namespace eshop_api.Entities
         public string Status { get; set; }
         public double Total { get; set; }
         public string Note { get; set; }
-        public string Check { get; set; }
-        public string CheckedAt { get; set; }
+        public DateTime CreateAt {get;set;}
+        public DateTime CheckedAt { get; set; }
         public string CheckedBy { get; set; }
         public string CheckedComment { get; set; }
         [ForeignKey("User")]

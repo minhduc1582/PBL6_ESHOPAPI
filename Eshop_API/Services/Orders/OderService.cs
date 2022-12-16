@@ -90,8 +90,8 @@ namespace eshop_api.Services.Orders
                     order.Status = i.Status;
                     order.Total = i.Total;
                     order.Note = i.Note;
-                    order.Check = i.Check;
                     order.CheckedAt = i.CheckedAt;
+                    order.CheckedAt = i.CreateAt;
                     order.CheckedBy = i.CheckedBy;
                     order.CheckedComment = i.CheckedComment;
                     order.UserId = i.UserId;
@@ -239,12 +239,11 @@ namespace eshop_api.Services.Orders
             return _context.Orders.ToList();
         }
 
-        public async Task<List<OrderView>> GetOrderById(Guid idOrder)
+        public async Task<OrderView> GetOrderById(Guid idOrder)
         {
             string payment = "";
             string time = "";
             var order = _context.Orders.FirstOrDefault(x => x.Id == idOrder);
-            List<OrderView> list = new List<OrderView>();
             if(order!=null)
             {
                 List<OrderDetailDTOs> details = await _orderDetailService.GetOrderDetailByOrderId(idOrder);
@@ -253,12 +252,11 @@ namespace eshop_api.Services.Orders
                 else payment = "COD";
                 if (order.DeliveryTime == 1) time = "Anytime";
                 else time = "Office hours only";
-                    list.Add(new OrderView(){
+                    OrderView orderView = new OrderView(){
                         Id = order.Id,
                         Status = order.Status,
                         Total = order.Total,
                         Note = order.Note,
-                        Check = order.Check,
                         CheckedAt = order.CheckedAt,
                         CheckedBy = order.CheckedBy,
                         CheckedComment = order.CheckedComment,
@@ -267,8 +265,8 @@ namespace eshop_api.Services.Orders
                         address = address,
                         Time = time,
                         Payment = payment
-                    });
-                return await Task.FromResult(list);
+                    };
+                return await Task.FromResult(orderView);
             }
             throw null;
         }
@@ -351,8 +349,8 @@ namespace eshop_api.Services.Orders
             if(order != null)
             {
                 order.Note = createUpdateOrder.Note;
-                order.Check = createUpdateOrder.Check;
                 order.CheckedAt = createUpdateOrder.CheckedAt;
+                order.CheckedAt = createUpdateOrder.CreateAt;
                 order.CheckedBy = createUpdateOrder.CheckedBy;
                 order.CheckedComment = createUpdateOrder.CheckedComment;
                 order.UserId = createUpdateOrder.UserId;
@@ -364,7 +362,7 @@ namespace eshop_api.Services.Orders
             else
             {
                 double temp = 0;
-                foreach(OrderDetailDTO i in createUpdateOrder.listpro)
+                foreach(OrderDetailDTO i in createUpdateOrder.listProduct)
                 {
                     var product = _context.Products.FirstOrDefault(x=> x.Id == i.ProductId);
                     temp += i.Quantity * product.Price;
@@ -373,7 +371,6 @@ namespace eshop_api.Services.Orders
                 order.Status = Status.Pending.ToString();
                 order.Total = temp;
                 order.Note = createUpdateOrder.Note;
-                order.Check = createUpdateOrder.Check;
                 order.CheckedAt = createUpdateOrder.CheckedAt;
                 order.CheckedBy = createUpdateOrder.CheckedBy;
                 order.CheckedComment = createUpdateOrder.CheckedComment;
@@ -381,7 +378,7 @@ namespace eshop_api.Services.Orders
                 CreateUpdateOrderDetail orderDetail = new CreateUpdateOrderDetail();
                 var result = await _context.Orders.AddAsync(order);
                 await _context.SaveChangesAsync();
-                foreach(OrderDetailDTO i in createUpdateOrder.listpro)
+                foreach(OrderDetailDTO i in createUpdateOrder.listProduct)
                 {
                     await _orderDetailService.AddOrderDetail(i, order.Id);
                 }
