@@ -214,7 +214,6 @@ namespace eshop_api.Service.Products
                 product.AvtImageUrl = CloudImage.UploadImage(updateProductDto.AvtImage);
                 product.Price = updateProductDto.Price;
                 product.Discount = updateProductDto.Discount;
-                product.ExportQuantity = 0;
                 product.ImportQuantity = updateProductDto.ImportQuantity;
                 product.Weight = updateProductDto.Weight;
                 product.Description = updateProductDto.Description;
