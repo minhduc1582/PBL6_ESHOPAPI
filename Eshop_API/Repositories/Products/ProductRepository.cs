@@ -8,7 +8,7 @@ using Eshop_API.Repositories.Generics;
 
 namespace Eshop_API.Repositories.Products
 {
-    public class ProductRepository: GenericRepository<Product>, IProductRepository
+    public class ProductRepository : GenericRepository<Product>, IProductRepository
     {
         private readonly DataContext _context;
         public ProductRepository(DataContext context) : base(context)
