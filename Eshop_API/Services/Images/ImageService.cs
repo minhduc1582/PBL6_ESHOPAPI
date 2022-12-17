@@ -6,15 +6,16 @@ using eshop_api.Entities;
 using eshop_api.Helpers;
 using eshop_api.Models.DTO.Images;
 using Eshop_API.Models.DTO.Images;
+using Eshop_API.Repositories.Images;
 
 namespace eshop_api.Services.Images
 {
     public class ImageService : IImageService
     {
-        private readonly DataContext _context;
+        private readonly IImageRepository _imageRepository;
 
-        public ImageService(DataContext context){
-            _context = context;
+        public ImageService(IImageRepository imageRepository){
+            _imageRepository = imageRepository;
         }
         public async Task<Image> AddImage(CreateImageDto createImage)
         {
@@ -26,8 +27,8 @@ namespace eshop_api.Services.Images
             image.Description = createImage.Description;
             image.ProductID = createImage.ProductID;
             image.Url = CloudImage.UploadImage(createImage.Image);
-            _context.Images.Add(image);
-            await _context.SaveChangesAsync();
+            await _imageRepository.Add(image);
+            await _imageRepository.SaveChangesAsync();
             return image;
         }
 
@@ -37,32 +38,32 @@ namespace eshop_api.Services.Images
             img.Name = image.FileName;
             img.Url = CloudImage.UploadImage(image);
             img.ProductID = IdProduct;
-            var result =await _context.Images.AddAsync(img);
-            await _context.SaveChangesAsync();
-            return result.Entity;
+            var result =await _imageRepository.Add(img);
+            await _imageRepository.SaveChangesAsync();
+            return result;
         }
 
         public async Task<bool> DeleteImageById(int Id)
         {
-            Image image = _context.Images.FirstOrDefault(x => x.Id == Id);
+            Image image = await _imageRepository.FirstOrDefault(x => x.Id == Id);
             if(image != null){
-                _context.Images.Remove(image);
-                await _context.SaveChangesAsync();
+                await _imageRepository.Remove(image);
+                await _imageRepository.SaveChangesAsync();
                 return true;
             }
             return false;
         }
 
 
-        public Task<List<Image>> GetImagesByIdProduct(int Id)
+        public async Task<List<Image>> GetImagesByIdProduct(int Id)
         {
-            List<Image> image = _context.Images.Where(x => x.Id == Id).ToList();
-            return Task.FromResult(image);
+            List<Image> image = await _imageRepository.Find(x => x.Id == Id);
+            return image;
         }
 
         public async Task<Image> UpdateImage(UpdateImageDto updateImage)
         {
-            Image image = _context.Images.FirstOrDefault(x => x.Id == updateImage.Id);
+            Image image = await _imageRepository.FirstOrDefault(x => x.Id == updateImage.Id);
             if(updateImage.Name == null || updateImage.Name == "")
                 image.Name = updateImage.Image.FileName;
             else
@@ -70,8 +71,8 @@ namespace eshop_api.Services.Images
             image.Description = updateImage.Description;
             image.ProductID = updateImage.ProductID;
             image.Url = CloudImage.UploadImage(updateImage.Image);
-            _context.Images.Add(image);
-            await _context.SaveChangesAsync();
+            await _imageRepository.Add(image);
+            await _imageRepository.SaveChangesAsync();
             return image;
         }
     }

@@ -106,12 +106,12 @@ namespace eshop_pbl6.Services.Identities
             try{
                 var user = _context.AppUsers.FirstOrDefault(x => x.Id == idUser);
                 if(user != null){
-                    user.Phone  = userDto.Phone;
-                    user.BirthDay = userDto.BirthDay;
-                    user.Email = userDto.Email;
-                    user.FirstName  = userDto.FirstName;
-                    user.LastName = userDto.LastName;
-                    user.Gender = userDto.Gender;
+                    user.Phone  = userDto.Phone ?? user.Phone;
+                    user.BirthDay = userDto.BirthDay ?? user.BirthDay;
+                    user.Email = userDto.Email ?? user.Email;
+                    user.FirstName  = userDto.FirstName ?? user.FirstName;
+                    user.LastName = userDto.LastName ?? user.LastName;
+                    user.Gender = userDto.Gender ?? user.Gender;
                     var result = _context.AppUsers.Update(user);
                     await _context.SaveChangesAsync();
                     var json = JsonSerializer.Serialize(userDto);

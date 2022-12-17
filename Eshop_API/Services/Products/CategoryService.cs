@@ -5,63 +5,64 @@ using System.Threading.Tasks;
 using eshop_api.Entities;
 using eshop_api.Helpers;
 using eshop_api.Models.DTO.Products;
+using Eshop_API.Repositories.Products;
 
 namespace eshop_api.Services.Products
 {
     public class CategoryService : ICategoryService
     {
-        private readonly DataContext _context;
+        private readonly ICategoryRepository _categoryRepository;
 
-        public CategoryService(DataContext context)
+        public CategoryService(ICategoryRepository categoryRepository)
         {
-            _context = context;
+            _categoryRepository = categoryRepository;
         }
         public async Task<Category> AddCategory(CreateUpdateCategory createCategory)
         {
             Category category = new Category();
             category.Name = createCategory.Name;
             category.ParentId = createCategory.ParentId;
-            var result = await _context.AddAsync(category);
-            await _context.SaveChangesAsync();
-            return result.Entity;
+            var result = await _categoryRepository.Add(category);
+            await _categoryRepository.SaveChangesAsync();
+            return result;
         }
 
         public async Task<bool> DeleteCateoryById(int Id)
         {
-            var category = _context.Categories.FirstOrDefault(x => x.Id == Id);
+            var category = await _categoryRepository.FirstOrDefault(x => x.Id == Id);
             if (category != null)
             {
-                var result = _context.Categories.Remove(category);
-                await _context.SaveChangesAsync();
+                var result = _categoryRepository.Remove(category);
+                await _categoryRepository.SaveChangesAsync();
                 return true;
             }
             return false;
         }
 
-        public List<Category> GetListCategory()
+        public async Task<List<Category>> GetListCategory()
         {
-            return _context.Categories.ToList();
+            return await _categoryRepository.GetAll();
         }
 
         public async Task<Category> UpdateCategory(CreateUpdateCategory updateCategory, int IdCategory)
         {
-            var category = _context.Categories.FirstOrDefault(x => x.Id == IdCategory);
+            var category = await _categoryRepository.FirstOrDefault(x => x.Id == IdCategory);
             if (category != null)
             {
                 category.Name = updateCategory.Name;
                 category.ParentId = updateCategory.ParentId;
-                var result = _context.Update(category);
-                await _context.SaveChangesAsync();
-                return result.Entity;
+                var result = await _categoryRepository.Update(category);
+                await _categoryRepository.SaveChangesAsync();
+                return result;
             }
             else
             {
                 category = new Category();
                 category.Name = updateCategory.Name;
                 category.ParentId = updateCategory.ParentId;
-                var result = await _context.AddAsync(category);
-                await _context.SaveChangesAsync();
-                return result.Entity;
+                var result = await _categoryRepository.Add(category);
+                await _categoryRepository.SaveChangesAsync();
+                return result;
             }
         }
     }

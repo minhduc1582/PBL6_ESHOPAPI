@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using eshop_api.Authorization;
 using eshop_api.Entities;
 using eshop_api.Models.DTO.Products;
 using eshop_api.Services.Products;
 using eshop_pbl6.Helpers.Common;
+using eshop_pbl6.Helpers.Identities;
 using eshop_pbl6.Helpers.Products;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -34,16 +36,21 @@ namespace eshop_api.Controllers.Products
             }
             
         }
+        /// <summary>
+        /// Lấy danh sách category theo cây
+        /// <para>Created by: MinhDuc</para>
+        /// </summary>
+        /// <response code="401">Lỗi chưa đăng nhập</response>
+        /// <response code="500">Lỗi khi có exception</response>
         [HttpGet("get-list-tree-category")]
-        [SwaggerOperation(Summary = "Get list category, return hierarchy tree")]
-        public IActionResult GetListTreeCategory(){
+        public async Task<IActionResult> GetListTreeCategory(){
             try{
             Category category = new Category(){
                 Id = -100,
                 Name = "EShopCategory",
                 ParentId = 0
             };
-            var result = _categoryService.GetListCategory();
+            var result = await _categoryService.GetListCategory();
             Node root = new Node{data = category};
             foreach(var item in result){
                 TreeCategory.AddNode(root,item);
@@ -55,7 +62,13 @@ namespace eshop_api.Controllers.Products
             }
             
         }
+        /// <summary>
+        /// Thêm danh mục sản phẩm
+        /// <para>Created by: MinhDuc</para>
+        /// </summary>
+        /// <response code="500">Lỗi khi có exception</response>
         [HttpPost("create-category")]
+        [Authorize(EshopPermissions.CategoryPermissions.Add)]
         public async Task<IActionResult> AddCategory(CreateUpdateCategory createCategory)
         {
             try

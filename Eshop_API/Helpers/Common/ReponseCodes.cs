@@ -3,7 +3,7 @@ namespace eshop_pbl6.Helpers.Common
     public enum ResponseCodes
     {
         Ok = 200,
-        ErrorException = 417,
+        ErrorException = 500,
         NotImplemented = 501,
         BadRequest = 400,
         Unauthorized = 401,

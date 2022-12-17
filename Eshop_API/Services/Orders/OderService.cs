@@ -15,24 +15,36 @@ using Eshop_API.Helpers.Order;
 using Newtonsoft.Json;
 using Eshop_API.Services.VNPAY;
 using Eshop_API.Models.DTO.VNPAY;
+using Eshop_API.Repositories.Orders;
+using Eshop_API.Repositories.Products;
+using Eshop_API.Repositories.Identities;
 
 namespace eshop_api.Services.Orders
 {
     public class OderService : IOrderService
     {
-        private readonly DataContext _context;
         private readonly IOderDetailService _orderDetailService;
         private readonly IAddressService _addressService;
         private readonly IVnPayService _vnPayService;
-        public OderService(DataContext context,
+        private readonly IOrderRepository _orderRepository;
+        private readonly IProductRepository _productRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly IOrderDetailRepository _orderDetailRepository;
+        public OderService( IOrderRepository orderRepository,
                             IOderDetailService orderDetailService,
                             IAddressService addressService,
-                            IVnPayService vnPayService)
+                            IVnPayService vnPayService,
+                            IProductRepository productRepository,
+                            IOrderDetailRepository orderDetailRepository,
+                            IUserRepository userRepository)
         {
-            _context = context;
+            _orderRepository = orderRepository;
             _orderDetailService = orderDetailService;
             _addressService = addressService;
             _vnPayService = vnPayService;
+            _productRepository = productRepository;
+            _userRepository = userRepository;
+            _orderDetailRepository = orderDetailRepository;
         }
         
         public async Task<OrderDto> AddOrder(List<OrderDetailDTO> orderDetailDTOs, int idUser, int idAddress, PaymentMethod payment, int time,string ipaddr)
@@ -40,7 +52,7 @@ namespace eshop_api.Services.Orders
             double temp = 0;
             foreach(OrderDetailDTO i in orderDetailDTOs)
             {
-                var product = _context.Products.FirstOrDefault(x=> x.Id == i.ProductId);
+                var product =await _productRepository.FirstOrDefault(x=> x.Id == i.ProductId);
                 temp += i.Quantity * product.Price;
                 await DelFromCart(i.ProductId, idUser, i.Quantity);
             }
@@ -52,8 +64,8 @@ namespace eshop_api.Services.Orders
             order.PaymentMethod = payment;
             order.DeliveryTime = time;
             CreateUpdateOrderDetail orderDetail = new CreateUpdateOrderDetail();
-            var result = (await _context.Orders.AddAsync(order)).Entity;
-            await _context.SaveChangesAsync();
+            var result = (await _orderRepository.Add(order));
+            await _orderRepository.SaveChangesAsync();
             foreach(OrderDetailDTO i in orderDetailDTOs)
             {
                 await _orderDetailService.AddOrderDetail(i, order.Id);
@@ -62,7 +74,7 @@ namespace eshop_api.Services.Orders
             var jsonOrder = JsonConvert.SerializeObject(result);
             var orderDto = JsonConvert.DeserializeObject<OrderDto>(jsonOrder);
             if(payment == PaymentMethod.Online){
-                var user = _context.AppUsers.FirstOrDefault(x => x.Id == idUser);
+                var user = await _userRepository.FirstOrDefault(x => x.Id == idUser);
                 ModelPayDto modalPayDto = new ModelPayDto{
                     Amount = result.Total,
                     Email = user.Email,
@@ -78,8 +90,8 @@ namespace eshop_api.Services.Orders
 
         public async Task<OrderView> GetCart(string username)
         {
-            int userId = _context.AppUsers.FirstOrDefault(x => x.Username == username).Id;
-            List<Order> orders = GetOrderByStatusOfEachUser(userId, 1).ToList();
+            int userId = (await _userRepository.FirstOrDefault(x => x.Username == username)).Id;
+            List<Order> orders = await GetOrderByStatusOfEachUser(userId, 1);
             OrderView order = new OrderView();
             if(orders!=null)
             {
@@ -103,8 +115,8 @@ namespace eshop_api.Services.Orders
             new_order.Status = Status.Cart.ToString();
             new_order.Total = 0;
             new_order.UserId = userId;
-            await _context.Orders.AddAsync(new_order);
-            await _context.SaveChangesAsync();
+            await _orderRepository.Add(new_order);
+            await _orderRepository.SaveChangesAsync();
             order.Id = new_order.Id;
             order.Status = new_order.Status;
             order.Total = new_order.Total;
@@ -115,11 +127,11 @@ namespace eshop_api.Services.Orders
         public async Task<Order> AddToCart(OrderDetailDTO detailDTOs, string username)
         {
             double temp = 0;
-            int userId = _context.AppUsers.FirstOrDefault(x => x.Username == username).Id;
-            var product = _context.Products.FirstOrDefault(x=> x.Id == detailDTOs.ProductId);
+            int userId = (await _userRepository.FirstOrDefault(x => x.Username == username)).Id;
+            var product = await _productRepository.FirstOrDefault(x=> x.Id == detailDTOs.ProductId);
             temp += detailDTOs.Quantity * product.Price;
             Boolean isExist = false;
-            List<Order> orders = GetOrdersByUserId(userId).ToList();
+            List<Order> orders = await GetOrdersByUserId(userId);
             foreach(Order i in orders)
             {
                 if(i.Status == "Cart")
@@ -144,9 +156,9 @@ namespace eshop_api.Services.Orders
                         await _orderDetailService.AddOrderDetail(detailDTOs, i.Id);
                     }
                     await UpdateTotal(i.Id);
-                    var result = _context.Orders.Update(i);
-                    await _context.SaveChangesAsync();
-                    return result.Entity;
+                    var result = await _orderRepository.Update(i);
+                    await _orderRepository.SaveChangesAsync();
+                    return result;
                 }
             }
             Order order = new Order();
@@ -154,15 +166,15 @@ namespace eshop_api.Services.Orders
             order.Total = temp;
             order.UserId = userId;
             CreateUpdateOrderDetail orderDetail = new CreateUpdateOrderDetail();
-            var results = await _context.Orders.AddAsync(order);
-            await _context.SaveChangesAsync();
+            var results = await _orderRepository.Add(order);
+            await _orderRepository.SaveChangesAsync();
             await _orderDetailService.AddOrderDetail(detailDTOs, order.Id);
-            return results.Entity;
+            return results;
         }
 
         public async Task<Order> ChangeStatus(Guid idOrder, int status)
         {
-            var order = _context.Orders.FirstOrDefault(x=> x.Id == idOrder);
+            var order = await _orderRepository.FirstOrDefault(x=> x.Id == idOrder);
             switch(status)
             {
                 case 1:
@@ -184,18 +196,18 @@ namespace eshop_api.Services.Orders
                     order.Status = Status.Cart.ToString();
                     break;
             }
-            var result = _context.Orders.Update(order);
-            await _context.SaveChangesAsync();
-            return result.Entity;
+            var result = await _orderRepository.Update(order);
+            await _orderRepository.SaveChangesAsync();
+            return result;
         }
 
         public async Task<bool> DeleteOrderById(Guid idOrder)
         {
-            var order = _context.Orders.FirstOrDefault(x => x.Id == idOrder);
+            var order = await _orderRepository.FirstOrDefault(x => x.Id == idOrder);
             if(order != null)
             {
-                var result = _context.Orders.Remove(order);
-                await _context.SaveChangesAsync();
+                var result = _orderRepository.Remove(order);
+                await _orderRepository.SaveChangesAsync();
                 return true;
             }
             return false;
@@ -203,10 +215,10 @@ namespace eshop_api.Services.Orders
 
         public async Task<Order> DelFromCart(int idProduct, int idUser, int quantity)
         {
-            List<Order> order = GetOrderByStatusOfEachUser(idUser, 1).ToList();
+            List<Order> order = await GetOrderByStatusOfEachUser(idUser, 1);
             foreach(Order i in order)
             {
-                List<OrderDetail> orderDetails = _orderDetailService.GetOrderDetailsByOrderId(i.Id).ToList();
+                List<OrderDetail> orderDetails = await _orderDetailService.GetOrderDetailsByOrderId(i.Id);
                 foreach(OrderDetail j in orderDetails)
                 {
                     if(j.ProductId == idProduct)
@@ -226,23 +238,23 @@ namespace eshop_api.Services.Orders
                     }
                 }
                 await UpdateTotal(i.Id);
-                var result = _context.Orders.Update(i);
-                await _context.SaveChangesAsync();
-                return result.Entity;
+                var result = await _orderRepository.Update(i);
+                await _orderRepository.SaveChangesAsync();
+                return result;
             }
             throw new NotImplementedException();
         }
 
-        public List<Order> GetListOrders()
+        public async Task<List<Order>> GetListOrders()
         {
-            return _context.Orders.ToList();
+            return await _orderRepository.GetAll();
         }
 
         public async Task<OrderView> GetOrderById(Guid idOrder)
         {
             string payment = "";
             string time = "";
-            var order = _context.Orders.FirstOrDefault(x => x.Id == idOrder);
+            var order = await _orderRepository.FirstOrDefault(x => x.Id == idOrder);
             if(order!=null)
             {
                 List<OrderDetailDTOs> details = await _orderDetailService.GetOrderDetailByOrderId(idOrder);
@@ -270,9 +282,9 @@ namespace eshop_api.Services.Orders
             throw null;
         }
 
-        public List<Order> GetOrderByStatusOfEachUser(int userId, int status)
+        public async Task<List<Order>> GetOrderByStatusOfEachUser(int userId, int status)
         {
-            var order = GetOrdersByUserId(userId);
+            var order = await GetOrdersByUserId(userId);
             string statuss = "";
             switch(status)
             {
@@ -303,7 +315,7 @@ namespace eshop_api.Services.Orders
             return temp;
         }
 
-        public List<Order> GetOrdersByStatus(int status)
+        public async Task<List<Order>> GetOrdersByStatus(int status)
         {
             string statuss = "";
             switch(status)
@@ -324,27 +336,27 @@ namespace eshop_api.Services.Orders
                     statuss = Status.Cancel.ToString();
                     break;
             }
-            var order = _context.Orders.Where(x => x.Status == statuss);
+            var order = await _orderRepository.Find(x => x.Status == statuss);
             if(order != null)
             {
-                return order.ToList();
+                return order;
             }
             throw null;
         }
 
-        public List<Order> GetOrdersByUserId(int userId)
+        public async Task<List<Order>> GetOrdersByUserId(int userId)
         {
-            var order = _context.Orders.Where(x => x.UserId == userId);
+            var order = await _orderRepository.Find(x => x.UserId == userId);
             if(order != null)
             {
-                return order.ToList();
+                return order;
             }
             throw null;
         }
 
         public async Task<Order> UpdateOrder(CreateUpdateOrder createUpdateOrder, Guid idOrder)
         {
-            var order = _context.Orders.FirstOrDefault(x => x.Id == idOrder);
+            var order = await _orderRepository.FirstOrDefault(x => x.Id == idOrder);
             if(order != null)
             {
                 order.Note = createUpdateOrder.Note;
@@ -353,17 +365,17 @@ namespace eshop_api.Services.Orders
                 order.CheckedBy = createUpdateOrder.CheckedBy;
                 order.CheckedComment = createUpdateOrder.CheckedComment;
                 order.UserId = createUpdateOrder.UserId;
-                var result = _context.Orders.Update(order);
-                await _context.SaveChangesAsync();
+                var result = await _orderRepository.Update(order);
+                await _orderRepository.SaveChangesAsync();
                 var temp = await UpdateTotal(order.Id);
-                return result.Entity;
+                return result;
             }
             else
             {
                 double temp = 0;
                 foreach(OrderDetailDTO i in createUpdateOrder.listProduct)
                 {
-                    var product = _context.Products.FirstOrDefault(x=> x.Id == i.ProductId);
+                    var product = await _productRepository.FirstOrDefault(x=> x.Id == i.ProductId);
                     temp += i.Quantity * product.Price;
                 }
                 order = new Order();
@@ -375,33 +387,33 @@ namespace eshop_api.Services.Orders
                 order.CheckedComment = createUpdateOrder.CheckedComment;
                 order.UserId = createUpdateOrder.UserId;
                 CreateUpdateOrderDetail orderDetail = new CreateUpdateOrderDetail();
-                var result = await _context.Orders.AddAsync(order);
-                await _context.SaveChangesAsync();
+                var result = await _orderRepository.Add(order);
+                await _orderRepository.SaveChangesAsync();
                 foreach(OrderDetailDTO i in createUpdateOrder.listProduct)
                 {
                     await _orderDetailService.AddOrderDetail(i, order.Id);
                 }
-                return result.Entity;
+                return result;
             }
         }
 
         public async Task<bool> UpdateTotal(Guid idOrder)
         {
             double temp = 0;
-            var order = _context.Orders.FirstOrDefault(x=> x.Id == idOrder);
+            var order = await _orderRepository.FirstOrDefault(x=> x.Id == idOrder);
             if(order == null) return false;
-            var orderDetail = _context.OrderDetails.Where(x=> x.OrderId == order.Id).ToList();
+            var orderDetail = await _orderDetailRepository.Find(x=> x.OrderId == order.Id);
             if(orderDetail != null)
             {
                 foreach(OrderDetail i in orderDetail)
                 {
-                    var product = _context.Products.FirstOrDefault(x=> x.Id == i.ProductId);
+                    var product =await _productRepository.FirstOrDefault(x=> x.Id == i.ProductId);
                     temp += i.Quantity * product.Price;
                 }
             }
             order.Total = temp;
-            var result = _context.Orders.Update(order);
-            await _context.SaveChangesAsync();
+            var result = _orderRepository.Update(order);
+            await _orderRepository.SaveChangesAsync();
             return true;
         }
     }

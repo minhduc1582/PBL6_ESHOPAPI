@@ -27,6 +27,9 @@ namespace eshop_pbl6.Helpers.Identities
         [FileExtensions(Extensions ="jpg,png,gif,jpeg,bmp,svg",ErrorMessage = "Ảnh không đúng định dạng")]
         public IFormFile Avatar { get; set; }
         public DateTime BirthDay { get; set; }
+        /// <summary>
+        /// Giới tính 0: Nam, 1: Nữ, 2:: Khác
+        /// </summary>
         public GenderEnum Gender { get; set; }
     }
 }
