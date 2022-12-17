@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using eshop_api.Entities;
 using eshop_api.Helpers;
-using Eshop_API.Helpers.Order;
+using Eshop_API.Helpers.Orders;
 using Eshop_API.Helpers.VNPAY;
 using Eshop_API.Models.DTO.VNPAY;
 using Eshop_API.Repositories.Orders;

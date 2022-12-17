@@ -6,15 +6,18 @@ using eshop_api.Entities;
 using eshop_api.Models.DTO.Order;
 using eshop_api.Helpers;
 using eshop_api.Services.Images;
-using eshop_pbl6.Helpers.Order;
+using eshop_pbl6.Helpers.Orders;
 using Microsoft.AspNetCore.Identity;
 using eshop_pbl6.Models.DTO.Identities;
 using eshop_pbl6.Services.Addresses;
 using Eshop_API.Models.DTO.Adress;
-using Eshop_API.Helpers.Order;
+using Eshop_API.Helpers.Orders;
 using Newtonsoft.Json;
 using Eshop_API.Services.VNPAY;
 using Eshop_API.Models.DTO.VNPAY;
+using System.Net.WebSockets;
+using Sentry;
+using AutoMapper;
 
 namespace eshop_api.Services.Orders
 {
@@ -24,15 +27,18 @@ namespace eshop_api.Services.Orders
         private readonly IOderDetailService _orderDetailService;
         private readonly IAddressService _addressService;
         private readonly IVnPayService _vnPayService;
+        private readonly IMapper _mapper;
         public OderService(DataContext context,
                             IOderDetailService orderDetailService,
                             IAddressService addressService,
-                            IVnPayService vnPayService)
+                            IVnPayService vnPayService,
+                            IMapper mapper)
         {
             _context = context;
             _orderDetailService = orderDetailService;
             _addressService = addressService;
             _vnPayService = vnPayService;
+            _mapper = mapper;
         }
         
         public async Task<OrderDto> AddOrder(List<OrderDetailDTO> orderDetailDTOs, int idUser, int idAddress, PaymentMethod payment, int time,string ipaddr)
@@ -49,6 +55,7 @@ namespace eshop_api.Services.Orders
             order.Total = temp;
             order.UserId = idUser;
             order.AddressId = idAddress;
+            order.CreateAt = DateTime.Now;
             order.PaymentMethod = payment;
             order.DeliveryTime = time;
             CreateUpdateOrderDetail orderDetail = new CreateUpdateOrderDetail();
@@ -59,8 +66,11 @@ namespace eshop_api.Services.Orders
                 await _orderDetailService.AddOrderDetail(i, order.Id);
             }
             result.User = null;
-            var jsonOrder = JsonConvert.SerializeObject(result);
-            var orderDto = JsonConvert.DeserializeObject<OrderDto>(jsonOrder);
+            //var jsonOrder = JsonConvert.SerializeObject(result);
+            //var orderDto = JsonConvert.DeserializeObject<OrderDto>(jsonOrder);
+            var orderDto = _mapper.Map<Order, OrderDto>(result);
+            string firstName = _context.AppUsers.FirstOrDefault(x => x.Id == idUser).FirstName;
+            orderDto.FirstName = firstName;
             if(payment == PaymentMethod.Online){
                 var user = _context.AppUsers.FirstOrDefault(x => x.Id == idUser);
                 ModelPayDto modalPayDto = new ModelPayDto{
@@ -160,33 +170,47 @@ namespace eshop_api.Services.Orders
             return results.Entity;
         }
 
-        public async Task<Order> ChangeStatus(Guid idOrder, int status)
+        public async Task<List<OrderDto>> ChangeStatus(List<Guid> idOrder, int status, string note)
         {
-            var order = _context.Orders.FirstOrDefault(x=> x.Id == idOrder);
-            switch(status)
+            var order = _context.Orders.ToList();
+            List<OrderDto> list = new List<OrderDto>();
+            foreach (var i in order)
             {
-                case 1:
-                    order.Status = Status.Cart.ToString();
-                    break;
-                case 2:
-                    order.Status = Status.Pending.ToString();
-                    break;
-                case 3:
-                    order.Status = Status.Shipping.ToString();
-                    break;
-                case 4:
-                    order.Status = Status.Shipped.ToString();
-                    break;
-                case 5:
-                    order.Status = Status.Cancel.ToString();
-                    break;
-                default:
-                    order.Status = Status.Cart.ToString();
-                    break;
+                foreach (var j in idOrder)
+                {
+                    if (i.Id == j)
+                    {
+                        switch (status)
+                        {
+                            case 1:
+                                i.Status = Status.Cart.ToString();
+                                break;
+                            case 2:
+                                i.Status = Status.Pending.ToString();
+                                break;
+                            case 3:
+                                i.Status = Status.Shipping.ToString();
+                                break;
+                            case 4:
+                                i.Status = Status.Shipped.ToString();
+                                break;
+                            case 5:
+                                i.Status = Status.Cancel.ToString();
+                                break;
+                            default:
+                                i.Status = Status.Cart.ToString();
+                                break;
+                        }
+                        if (note != null) i.Note = note;
+                        i.CheckedAt = DateTime.Now;
+                        var result = _context.Orders.Update(i);
+                        await _context.SaveChangesAsync();
+                        OrderDto orderDto = _mapper.Map<Order, OrderDto>(result.Entity);
+                        list.Add(orderDto);
+                    }
+                }
             }
-            var result = _context.Orders.Update(order);
-            await _context.SaveChangesAsync();
-            return result.Entity;
+            return list;
         }
 
         public async Task<bool> DeleteOrderById(Guid idOrder)
@@ -303,7 +327,7 @@ namespace eshop_api.Services.Orders
             return temp;
         }
 
-        public List<Order> GetOrdersByStatus(int status)
+        public List<OrderDto> GetOrdersByStatus(int status)
         {
             string statuss = "";
             switch(status)
@@ -324,10 +348,21 @@ namespace eshop_api.Services.Orders
                     statuss = Status.Cancel.ToString();
                     break;
             }
-            var order = _context.Orders.Where(x => x.Status == statuss);
+            var order = _context.Orders.Where(x => x.Status == statuss).ToList();
+            
             if(order != null)
             {
-                return order.ToList();
+                List<OrderDto> list = new List<OrderDto>();
+                foreach (var i in order)
+                {
+                    //var jsonOrder = JsonConvert.SerializeObject(i);
+                    //var orderDto = JsonConvert.DeserializeObject<OrderDto>(jsonOrder);
+                    var orderDto = _mapper.Map<Order, OrderDto>(i);
+                    string firstName = _context.AppUsers.FirstOrDefault(x => x.Id == i.UserId).FirstName;
+                    orderDto.FirstName = firstName;
+                    list.Add(orderDto);
+                }
+                return list;
             }
             throw null;
         }

@@ -1,4 +1,4 @@
-namespace Eshop_API.Helpers.Order
+namespace Eshop_API.Helpers.Orders
 {
     public enum PaymentMethod
     {
