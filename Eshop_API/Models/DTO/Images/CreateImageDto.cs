@@ -12,7 +12,7 @@ namespace eshop_api.Models.DTO.Images
         public string Name{get;set;}
         [Required]
         [DataType(DataType.Upload,ErrorMessage = "Ảnh không đúng định dạng")]
-        [FileExtensions(Extensions ="jpg,png,gif,jpeg,bmp,svg",ErrorMessage = "Ảnh không đúng định dạng")]
+        // [FileExtensions(Extensions ="jpg,png,gif,jpeg,bmp,svg",ErrorMessage = "Ảnh không đúng định dạng")]
         public IFormFile Image{get;set;}
         public string Description{get;set;}
         [Required]

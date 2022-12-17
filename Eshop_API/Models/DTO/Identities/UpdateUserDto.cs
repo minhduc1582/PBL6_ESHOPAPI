@@ -19,7 +19,7 @@ namespace eshop_pbl6.Models.DTO.Identities
         [RegularExpression(@"(84|0[3|5|7|8|9])+([0-9]{8})\b", ErrorMessage ="Số điện thoại không đúng định dạng")]
         public string Phone { get; set; }
         [DataType(DataType.Upload, ErrorMessage ="Ảnh không đúng định dạng")]
-        [FileExtensions(Extensions ="jpg,png,gif,jpeg,bmp,svg",ErrorMessage = "Ảnh không đúng định dạng")]
+        // [FileExtensions(Extensions ="jpg,png,gif,jpeg,bmp,svg",ErrorMessage = "Ảnh không đúng định dạng")]
         public IFormFile AvatarUrl { get; set; }
         [DataType(DataType.Date,ErrorMessage ="Ngày sinh không đúng định dạng")]
         public DateTime BirthDay { get; set; }
