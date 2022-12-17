@@ -115,10 +115,15 @@ namespace eshop_pbl6.Controllers.Identities
 
         // Change Password
         [HttpPut("change-password")]
-        public async Task<IActionResult> ChangePassword(string username, string passwordOld, string passwordNew)
+        [Authorize(EshopPermissions.UserPermissions.Edit)]
+        public async Task<IActionResult> ChangePassword(string passwordOld, string passwordNew)
         {
             try
             {
+                var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                var handler = new JwtSecurityTokenHandler();
+                var jwtSecurityToken = handler.ReadJwtToken(token);
+                string username = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == "nameid").Value;
                 if (await _userService.ChangePassworrd(username, passwordOld, passwordNew) == true)
                 {
                     return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "Thay đổi mật khẩu thành công", true));

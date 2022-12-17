@@ -28,6 +28,7 @@ namespace eshop_pbl6.Authorization
                 new Claim("FirstName", user?.FirstName ?? ""),
                 new Claim("LastName", user?.LastName ?? ""),
                 new Claim("AvatarUrl", user?.AvatarUrl ?? ""),
+                new Claim("RoleId", user?.RoleId.ToString() ?? ""),
                 new Claim(JwtRegisteredClaimNames.Gender, user?.Gender.ToString() ?? ""),
                 new Claim(JwtRegisteredClaimNames.Birthdate, user?.BirthDay.ToString() ?? ""),
                 new Claim(JwtRegisteredClaimNames.Email, user?.Email)

@@ -1,7 +1,9 @@
-﻿using eshop_api.Controllers;
+﻿using eshop_api.Authorization;
+using eshop_api.Controllers;
 using eshop_api.Models.DTO.Order;
 using Eshop_API.Models.DTO.Adress;
 using eshop_pbl6.Helpers.Common;
+using eshop_pbl6.Helpers.Identities;
 using eshop_pbl6.Services.Addresses;
 using eshop_pbl6.Services.Identities;
 using Microsoft.AspNetCore.Mvc;
@@ -19,7 +21,12 @@ namespace Eshop_API.Controllers.Address
         {
             _addressService = addressService;
         }
-
+        
+        /// <summary>
+        /// Lấy danh sách các tỉnh
+        /// <para>Created by: MinhDuc</para>
+        /// </summary>
+        /// <response code="500">Lỗi khi có exception</response>
         [HttpGet("get-province")]
         public IActionResult GetProvince()
         {
@@ -33,6 +40,11 @@ namespace Eshop_API.Controllers.Address
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.ErrorException, ex.Message, "null"));
             }
         }
+        /// <summary>
+        /// Lấy danh sách các huyện
+        /// <para>Created by: MinhDuc</para>
+        /// </summary>
+        /// <response code="500">Lỗi khi có exception</response>
         [HttpGet("get-district")]
         public IActionResult GetDistrict(int idProvince)
         {
@@ -46,6 +58,11 @@ namespace Eshop_API.Controllers.Address
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.ErrorException, ex.Message, "null"));
             }
         }
+        /// <summary>
+        /// Lấy danh sách các xã
+        /// <para>Created by: MinhDuc</para>
+        /// </summary>
+        /// <response code="500">Lỗi khi có exception</response>
         [HttpGet("get-community")]
         public IActionResult GetCommunity(int idDistrict)
         {
@@ -59,7 +76,14 @@ namespace Eshop_API.Controllers.Address
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.ErrorException, ex.Message, "null"));
             }
         }
+        /// <summary>
+        /// lấy danh sách địa chỉ của người dùng
+        /// <para>Created by: MinhDuc</para>
+        /// </summary>
+        /// <response code="401">Lỗi không đăng nhập</response>
+        /// <response code="500">Lỗi khi có exception</response>
         [HttpGet("get-list-address-by-user")]
+        [Authorize(EshopPermissions.AddressPermissions.Get)]
         public IActionResult GetListAddressByUser()
         {
             try
@@ -76,7 +100,14 @@ namespace Eshop_API.Controllers.Address
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.ErrorException, ex.Message, "null"));
             }
         }
+        /// <summary>
+        /// lấy địa chỉ theo id
+        /// <para>Created by: MinhDuc</para>
+        /// </summary>
+        /// <response code="401">Lỗi không đăng nhập</response>
+        /// <response code="500">Lỗi khi có exception</response>
         [HttpGet("get-address-by-id")]
+        [Authorize(EshopPermissions.AddressPermissions.Get)]
         public IActionResult GetAddressById(int idAddress)
         {
             try
@@ -89,7 +120,14 @@ namespace Eshop_API.Controllers.Address
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.ErrorException, ex.Message, "null"));
             }
         }
+        /// <summary>
+        /// thêm địa chỉ của người dùng
+        /// <para>Created by: MinhDuc</para>
+        /// </summary>
+        /// <response code="401">Lỗi không đăng nhập</response>
+        /// <response code="500">Lỗi khi có exception</response>
         [HttpPost("add-address")]
+        [Authorize(EshopPermissions.AddressPermissions.Add)]
         public async Task<IActionResult> AddAddress(CreateUpdateAddress createUpdateAddress)
         {
             try
@@ -107,7 +145,14 @@ namespace Eshop_API.Controllers.Address
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.ErrorException, ex.Message, "null"));
             }
         }
+        /// <summary>
+        /// chỉnh sửa địa chỉ của người dùng
+        /// <para>Created by: MinhDuc</para>
+        /// </summary>
+        /// <response code="401">Lỗi không đăng nhập</response>
+        /// <response code="500">Lỗi khi có exception</response>
         [HttpPut("update-address")]
+        [Authorize(EshopPermissions.AddressPermissions.Edit)]
         public async Task<IActionResult> UpdateAddress(CreateUpdateAddress createUpdateAddress, int idAddress)
         {
             try
@@ -120,7 +165,14 @@ namespace Eshop_API.Controllers.Address
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.ErrorException, ex.Message, "null"));
             }
         }
+        /// <summary>
+        /// Xóa địa chỉ của người dùng
+        /// <para>Created by: MinhDuc</para>
+        /// </summary>
+        /// <response code="401">Lỗi không đăng nhập</response>
+        /// <response code="500">Lỗi khi có exception</response>
         [HttpDelete("del-address")]
+        [Authorize(EshopPermissions.AddressPermissions.Delete)]
         public async Task<IActionResult> DelAddress(int idAddress)
         {
             try
