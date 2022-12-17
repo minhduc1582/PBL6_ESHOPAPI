@@ -13,7 +13,7 @@ using eshop_pbl6.Helpers.Identities;
 using System.IdentityModel.Tokens.Jwt;
 using Eshop_API.Services.VNPAY;
 using Eshop_API.Models.DTO.VNPAY;
-using Eshop_API.Helpers.Order;
+using Eshop_API.Helpers.Orders;
 
 namespace eshop_api.Controllers.Products
 {
@@ -100,6 +100,12 @@ namespace eshop_api.Controllers.Products
         {
             try{
                 string remoteIpAddress = HttpContext.Connection.RemoteIpAddress.ToString();
+                string urlOrigin = "";
+                if (HttpContext.Request.Headers.ContainsKey("Origin"))
+                {
+                    urlOrigin = Request.Headers["Origin"];
+                    // Do stuff with the values... probably .FirstOrDefault()
+                }
                 //var serId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
                 var handler = new JwtSecurityTokenHandler();
@@ -108,7 +114,7 @@ namespace eshop_api.Controllers.Products
                 // var claimsIdentity = (ClaimsIdentity)User.Identity;
                 // var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
                 // int userId = Convert.ToInt32(claim.Value);
-                var result = await _orderService.AddOrder(orderDetailDTO, int.Parse(idUser), idAddress, payment, time,remoteIpAddress);
+                var result = await _orderService.AddOrder(orderDetailDTO, int.Parse(idUser), idAddress, payment, time,remoteIpAddress,urlOrigin);
                 //result.Id
                 
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "thêm dữ liệu thành công", result));
@@ -182,10 +188,10 @@ namespace eshop_api.Controllers.Products
             }
         }
         [HttpPut("change-status")]
-        public async Task<IActionResult> ChangeStatus(Guid idOrder, int status)
+        public async Task<IActionResult> ChangeStatus(List<Guid> idOrder, int status, string note)
         {
             try{
-                var result = await _orderService.ChangeStatus(idOrder, status);
+                var result = await _orderService.ChangeStatus(idOrder, status, note);
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "cập nhật dữ liệu thành công", result));
             }
             catch(Exception ex)

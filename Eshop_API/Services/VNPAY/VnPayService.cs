@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using eshop_api.Entities;
 using eshop_api.Helpers;
-using Eshop_API.Helpers.Order;
+using Eshop_API.Helpers.Orders;
 using Eshop_API.Helpers.VNPAY;
 using Eshop_API.Models.DTO.VNPAY;
 using Eshop_API.Repositories.Orders;
@@ -102,7 +102,7 @@ namespace Eshop_API.Services.VNPAY
         {
               //  var remoteIpAddress = HttpContext.Connection.RemoteIpAddress;
                 string url = _configuration["Vnpay:BaseUrl"];
-                string returnUrl = _configuration["Vnpay:ReturnUrl"];
+                string returnUrl = payInfo.UrlOrigin;
                 string tmnCode = _configuration["Vnpay:TmnCode"];
                 string hashSecret = _configuration["Vnpay:HashSecret"];
                 string Version = _configuration["Vnpay:Version"];
