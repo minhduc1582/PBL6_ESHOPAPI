@@ -26,5 +26,6 @@ namespace Eshop_API.Models.DTO.VNPAY
         public string Name{get;set;}
         [Required]
         public Guid Tnx_Ref{get;set;}
+        public string UrlOrigin{get;set;}
     }
 }

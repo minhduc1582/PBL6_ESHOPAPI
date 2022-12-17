@@ -28,7 +28,9 @@ namespace eshop_api.Services.Orders
         private readonly IAddressService _addressService;
         private readonly IVnPayService _vnPayService;
         private readonly IMapper _mapper;
+        private readonly IConfiguration _configuration;
         public OderService(DataContext context,
+                            IConfiguration configuration,
                             IOderDetailService orderDetailService,
                             IAddressService addressService,
                             IVnPayService vnPayService,
@@ -39,9 +41,10 @@ namespace eshop_api.Services.Orders
             _addressService = addressService;
             _vnPayService = vnPayService;
             _mapper = mapper;
+            _configuration = configuration;
         }
         
-        public async Task<OrderDto> AddOrder(List<OrderDetailDTO> orderDetailDTOs, int idUser, int idAddress, PaymentMethod payment, int time,string ipaddr)
+        public async Task<OrderDto> AddOrder(List<OrderDetailDTO> orderDetailDTOs, int idUser, int idAddress, PaymentMethod payment, int time,string ipaddr,string UrlOrigin)
         {
             double temp = 0;
             foreach(OrderDetailDTO i in orderDetailDTOs)
@@ -73,12 +76,14 @@ namespace eshop_api.Services.Orders
             orderDto.FirstName = firstName;
             if(payment == PaymentMethod.Online){
                 var user = _context.AppUsers.FirstOrDefault(x => x.Id == idUser);
+                string url = (string.IsNullOrEmpty(UrlOrigin) == true ? _configuration["Vnpay:ReturnUrl"] : UrlOrigin) +  _configuration["Vnpay:EndPointPage"];
                 ModelPayDto modalPayDto = new ModelPayDto{
                     Amount = result.Total,
                     Email = user.Email,
                     Name = user.FirstName + user.LastName,
                     Content = "Thanh toan don hang " + result.Id,
-                    Tnx_Ref = result.Id
+                    Tnx_Ref = result.Id,
+                    UrlOrigin = url
                 };
                 orderDto.PaymentURL = await _vnPayService.CreateRequestUrl(modalPayDto,ipaddr);
                 return orderDto;

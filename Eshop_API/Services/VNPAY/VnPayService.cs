@@ -102,7 +102,7 @@ namespace Eshop_API.Services.VNPAY
         {
               //  var remoteIpAddress = HttpContext.Connection.RemoteIpAddress;
                 string url = _configuration["Vnpay:BaseUrl"];
-                string returnUrl = _configuration["Vnpay:ReturnUrl"];
+                string returnUrl = payInfo.UrlOrigin;
                 string tmnCode = _configuration["Vnpay:TmnCode"];
                 string hashSecret = _configuration["Vnpay:HashSecret"];
                 string Version = _configuration["Vnpay:Version"];
