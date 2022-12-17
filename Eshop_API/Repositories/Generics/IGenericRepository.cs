@@ -16,5 +16,7 @@ namespace Eshop_API.Repositories.Generics
         Task AddRange(IEnumerable<T> entities);
         Task Remove(T entity);
         Task RemoveRange(IEnumerable<T> entities);
+        Task SaveChangesAsync();
+        Task<T> Update(T entity);
     }
 }

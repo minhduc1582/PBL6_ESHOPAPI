@@ -7,18 +7,23 @@ using eshop_api.Models.DTO.Order;
 using eshop_api.Helpers;
 using eshop_api.Helpers.Mapper;
 using Eshop_API.Repositories.Orders;
+using eshop_api.Service.Products;
+using Eshop_API.Repositories.Products;
 
 namespace eshop_api.Services.Orders
 {
     public class OderDetailService : IOderDetailService
     {
-        private readonly DataContext _context;
+        private readonly IOrderDetailRepository _orderDetailRepository;
         private readonly IOrderRepository _orderRepository;
-        public OderDetailService(DataContext context,
-                                IOrderRepository orderRepository)
+        private readonly IProductRepository _productRepository;
+        public OderDetailService(IOrderDetailRepository orderDetailRepository,
+                                IOrderRepository orderRepository,
+                                IProductRepository productRepository)
         {
-            _context = context;
+            _orderDetailRepository = orderDetailRepository;
             _orderRepository = orderRepository;
+            _productRepository = productRepository;
         }
         public async Task<OrderDetail> AddOrderDetail(CreateUpdateOrderDetail createUpdateOrderDetail)
         {
@@ -27,11 +32,11 @@ namespace eshop_api.Services.Orders
             orderDetail.ProductId = createUpdateOrderDetail.ProductId;
             orderDetail.Quantity = createUpdateOrderDetail.Quantity;
             orderDetail.Note = createUpdateOrderDetail.Note;
-            var result = await _context.OrderDetails.AddAsync(orderDetail);
-            await _context.SaveChangesAsync();
+            var result = await _orderDetailRepository.Add(orderDetail);
+            await _orderDetailRepository.SaveChangesAsync();
             await _orderRepository.UpdateTotal(orderDetail.OrderId);
             // var temp = await UpdateTotal(orderDetail.OrderId);
-            return result.Entity;
+            return result;
         }
         public async Task<OrderDetail> AddOrderDetail(OrderDetailDTO orderDetailDTO, Guid idOrder)
         {
@@ -40,27 +45,27 @@ namespace eshop_api.Services.Orders
             orderDetail.ProductId = orderDetailDTO.ProductId;
             orderDetail.Quantity = orderDetailDTO.Quantity;
             orderDetail.Note = orderDetailDTO.Note;
-            var result = await _context.OrderDetails.AddAsync(orderDetail);
-            await _context.SaveChangesAsync();
-            return result.Entity;
+            var result = await _orderDetailRepository.Add(orderDetail);
+            await _orderDetailRepository.SaveChangesAsync();
+            return result;
         }
 
         public async Task<bool> DeleteOrderDetail(int idOrderDetail)
         {
-            var orderDetail = _context.OrderDetails.FirstOrDefault(x => x.Id == idOrderDetail);
+            var orderDetail = await _orderDetailRepository.FirstOrDefault(x => x.Id == idOrderDetail);
             if(orderDetail != null)
             {
-                var result = _context.OrderDetails.Remove(orderDetail);
-                await _context.SaveChangesAsync();
+                var result = _orderDetailRepository.Remove(orderDetail);
+                await _orderDetailRepository.SaveChangesAsync();
                 var temp = await _orderRepository.UpdateTotal(orderDetail.OrderId);
                 return true;
             }
             return false;
         }
 
-        public List<OrderDetail> GetOrderDetailsById(int idOrderDetail)
+        public async Task<List<OrderDetail>> GetOrderDetailsById(int idOrderDetail)
         {
-            var orderDetail = _context.OrderDetails.Where(x => x.Id == idOrderDetail);
+            var orderDetail = await _orderDetailRepository.Find(x => x.Id == idOrderDetail);
             if(orderDetail != null)
             {
                 return orderDetail.ToList();
@@ -68,9 +73,9 @@ namespace eshop_api.Services.Orders
             throw null;
         }
 
-        public List<OrderDetail> GetOrderDetailsByOrderId(Guid idOrder)
+        public async Task<List<OrderDetail>> GetOrderDetailsByOrderId(Guid idOrder)
         {
-            var orderDetail = _context.OrderDetails.Where(x => x.OrderId == idOrder);
+            var orderDetail =await _orderDetailRepository.Find(x => x.OrderId == idOrder);
             if(orderDetail != null)
             {
                 return orderDetail.ToList();
@@ -79,13 +84,13 @@ namespace eshop_api.Services.Orders
         }
         public async Task<List<OrderDetailDTOs>> GetOrderDetailByOrderId(Guid idOrder)
         {
-            var orderDetail = _context.OrderDetails.Where(x => x.OrderId == idOrder).ToList();
+            var orderDetail = await _orderDetailRepository.Find(x => x.OrderId == idOrder);
             if(orderDetail != null)
             {
                 List<OrderDetailDTOs> list = new List<OrderDetailDTOs>();
                 foreach(OrderDetail i in orderDetail)
                 {
-                    var product = _context.Products.FirstOrDefault(x => x.Id == i.ProductId);
+                    var product = await _productRepository.FirstOrDefault(x => x.Id == i.ProductId);
                     OrderDetailDTOs orderDetailDTOs = OrderDetailMapper.toOrderDetailDto(i, product);
                     list.Add(orderDetailDTOs);
                 }
@@ -96,16 +101,16 @@ namespace eshop_api.Services.Orders
 
         public async Task<OrderDetail> UpdateOrderDetail(CreateUpdateOrderDetail createUpdateOrderDetail, int idOrderDetail)
         {
-            var orderDetail = _context.OrderDetails.FirstOrDefault(x => x.Id == idOrderDetail);
+            var orderDetail = await _orderDetailRepository.FirstOrDefault(x => x.Id == idOrderDetail);
             if(orderDetail != null)
             {
                 orderDetail.ProductId = createUpdateOrderDetail.ProductId;
                 orderDetail.Quantity = createUpdateOrderDetail.Quantity;
                 orderDetail.Note = createUpdateOrderDetail.Note;
-                var result =  _context.OrderDetails.Update(orderDetail);
-                await _context.SaveChangesAsync();
+                var result = await _orderDetailRepository.Update(orderDetail);
+                await _orderDetailRepository.SaveChangesAsync();
                 var temp = await _orderRepository.UpdateTotal(orderDetail.OrderId);
-                return result.Entity;
+                return result;
             }
             else
             {
@@ -113,13 +118,11 @@ namespace eshop_api.Services.Orders
                 orderDetail.ProductId = createUpdateOrderDetail.ProductId;
                 orderDetail.Quantity = createUpdateOrderDetail.Quantity;
                 orderDetail.Note = createUpdateOrderDetail.Note;
-                var result = await _context.OrderDetails.AddAsync(orderDetail);
-                await _context.SaveChangesAsync();
+                var result = await _orderDetailRepository.Add(orderDetail);
+                await _orderDetailRepository.SaveChangesAsync();
                 var temp = await _orderRepository.UpdateTotal(orderDetail.OrderId);
-                return result.Entity;
+                return result;
             }
         }
-
-       
     }
 }

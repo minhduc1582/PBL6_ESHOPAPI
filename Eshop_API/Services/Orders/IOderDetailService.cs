@@ -8,8 +8,8 @@ namespace eshop_api.Services.Orders
 {
     public interface IOderDetailService
     {
-        List<OrderDetail> GetOrderDetailsById(int idOrderDetail); //Lấy chi tiết đơn hàng theo id
-        List<OrderDetail> GetOrderDetailsByOrderId(Guid idOrder); //Lấy chi tiết đơn hàng theo id đơn hàng
+        Task<List<OrderDetail>> GetOrderDetailsById(int idOrderDetail); //Lấy chi tiết đơn hàng theo id
+        Task<List<OrderDetail>> GetOrderDetailsByOrderId(Guid idOrder); //Lấy chi tiết đơn hàng theo id đơn hàng
         Task<List<OrderDetailDTOs>> GetOrderDetailByOrderId(Guid idOrder); //Lấy chi tiết đơn hàng theo id đơn hàng
         Task<OrderDetail> AddOrderDetail(CreateUpdateOrderDetail createUpdateOrderDetail);
         Task<OrderDetail> AddOrderDetail(OrderDetailDTO orderDetailDTO, Guid idOrder);// Thêm chi tiết đơn hàng
