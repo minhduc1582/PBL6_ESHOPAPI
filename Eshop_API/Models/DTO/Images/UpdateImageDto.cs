@@ -13,7 +13,6 @@ namespace Eshop_API.Models.DTO.Images
         public string Name{get;set;}
         [Required(ErrorMessage = "Ảnh không được bỏ trống")]
         [DataType(DataType.Upload,ErrorMessage = "Ảnh không đúng định dạng")]
-        [FileExtensions(Extensions ="jpg,png,gif,jpeg,bmp,svg",ErrorMessage = "Ảnh không đúng định dạng")]
         public IFormFile Image{get;set;}
         public string Description{get;set;}
         [Required(ErrorMessage = "ProductId không được bỏ trống")]

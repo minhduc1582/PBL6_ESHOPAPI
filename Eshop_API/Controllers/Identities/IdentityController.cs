@@ -71,6 +71,12 @@ namespace eshop_pbl6.Controllers.Identities
             result.Results["Success"] = true;
             return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "Đăng kí thành công", result));
         }
+        /// <summary>
+        /// Đăng nhập
+        /// <para>Created by: MinhDuc</para>
+        /// </summary>
+        /// <returns>Trả về UserName, Success bool, Token</returns>
+        /// <response code="500">Lỗi khi có exception</response>
         [HttpPost("login")]
         public IActionResult Login([FromBody] UserLogin userLoin)
         {
@@ -109,10 +115,15 @@ namespace eshop_pbl6.Controllers.Identities
 
         // Change Password
         [HttpPut("change-password")]
-        public async Task<IActionResult> ChangePassword(string username, string passwordOld, string passwordNew)
+        [Authorize(EshopPermissions.UserPermissions.Edit)]
+        public async Task<IActionResult> ChangePassword(string passwordOld, string passwordNew)
         {
             try
             {
+                var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                var handler = new JwtSecurityTokenHandler();
+                var jwtSecurityToken = handler.ReadJwtToken(token);
+                string username = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == "nameid").Value;
                 if (await _userService.ChangePassworrd(username, passwordOld, passwordNew) == true)
                 {
                     return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "Thay đổi mật khẩu thành công", true));

@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using eshop_api.Entities;
 using Eshop_API.Repositories.Generics;
 
-namespace Eshop_API.Repositories.VnPays
+namespace Eshop_API.Repositories.Identities
 {
-    public interface IBillPaymentRepository : IGenericRepository<BillPay>
+    public interface IRoleRepository : IGenericRepository<Role>
     {
-
+        
     }
 }

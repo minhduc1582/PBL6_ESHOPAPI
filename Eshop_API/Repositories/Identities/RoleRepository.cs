@@ -6,12 +6,12 @@ using eshop_api.Entities;
 using eshop_api.Helpers;
 using Eshop_API.Repositories.Generics;
 
-namespace Eshop_API.Repositories.VnPays
+namespace Eshop_API.Repositories.Identities
 {
-    public class BillPaymentRepository: GenericRepository<BillPay>, IBillPaymentRepository
+    public class RoleRepository : GenericRepository<Role>, IRoleRepository
     {
-         private readonly DataContext _context;
-        public BillPaymentRepository(DataContext context) : base(context)
+        private readonly DataContext _context;
+        public RoleRepository(DataContext context) : base(context)
         {
             _context = context;
         }

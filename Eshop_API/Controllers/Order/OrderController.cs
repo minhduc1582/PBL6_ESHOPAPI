@@ -14,12 +14,14 @@ using System.IdentityModel.Tokens.Jwt;
 using Eshop_API.Services.VNPAY;
 using Eshop_API.Models.DTO.VNPAY;
 using Eshop_API.Helpers.Orders;
+using Eshop_API.Services.Identities;
 
 namespace eshop_api.Controllers.Products
 {
     public class OrderController : BaseController
     {
         private readonly IOrderService _orderService;
+        private readonly IRoleService _roleService;
         //private readonly IVnPayService _vnPayService;
         public OrderController(IOrderService orderService)
                               //  IVnPayService vnPayService)
@@ -28,6 +30,7 @@ namespace eshop_api.Controllers.Products
          //   _vnPayService = vnPayService;
         }
         [HttpGet("get-list-order")]
+        [Authorize(EshopPermissions.OrderPermissions.GetList)]
         public IActionResult GetListOrders()
         {
             try{
@@ -40,6 +43,7 @@ namespace eshop_api.Controllers.Products
             }
         }
         [HttpGet("get-order-by-userid")]
+        [Authorize(EshopPermissions.OrderPermissions.Get)]
         public IActionResult GetOrdersByUserId(int userId)
         {
             try{
@@ -188,7 +192,8 @@ namespace eshop_api.Controllers.Products
             }
         }
         [HttpPut("change-status")]
-        public async Task<IActionResult> ChangeStatus(List<Guid> idOrder, int status, string note)
+        [Authorize(EshopPermissions.OrderPermissions.Edit)]
+        public async Task<IActionResult> ChangeStatus(List<Guid> idOrder, int status,string note)
         {
             try{
                 var result = await _orderService.ChangeStatus(idOrder, status, note);

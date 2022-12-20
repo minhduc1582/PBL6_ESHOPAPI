@@ -14,7 +14,6 @@ namespace eshop_api.Models.DTO.Products
         public string Keyword{get;set;}
         [Required(ErrorMessage = "Ảnh product đại diện không được bỏ trống")]
         [DataType(DataType.Upload,ErrorMessage = "Ảnh không đúng định dạng")]
-        [FileExtensions(Extensions ="jpg,png,gif,jpeg,bmp,svg",ErrorMessage = "Ảnh không đúng định dạng")]
         public IFormFile AvtImage{get;set;}
         [Required]
         [Range(1,double.MaxValue, ErrorMessage = "giá không được thấp hơn hăọc bằng 0 VND")]
@@ -32,7 +31,6 @@ namespace eshop_api.Models.DTO.Products
         public Dictionary<string, object> Detail{get;set;}
         [Required]
         [DataType(DataType.Upload,ErrorMessage = "Ảnh không đúng định dạng")]
-        [FileExtensions(Extensions ="jpg,png,gif,jpeg,bmp,svg",ErrorMessage = "Ảnh không đúng định dạng")]
         public IFormFileCollection ProductImages{get;set;}
         [Required]
         public int IdCategory{get;set;}

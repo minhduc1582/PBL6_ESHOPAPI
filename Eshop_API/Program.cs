@@ -32,6 +32,10 @@ using Eshop_API;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using eshop_pbl6.Helpers.Common;
+using Eshop_API.Repositories.Addresses;
+using Eshop_API.Repositories.Identities;
+using Eshop_API.Repositories.Images;
+using Eshop_API.Repositories.Products;
 using Eshop_API.Helpers.Profiles;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -92,7 +96,14 @@ builder.Services.AddSwaggerGen(
                             }
                  });
                 //
+                // using System.Reflection;
+               var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+                // var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                //     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                //     c.IncludeXmlComments(xmlPath);
             }
+    
 );
 
 services.AddDbContext<DataContext>(
@@ -134,6 +145,12 @@ services.AddAutoMapper(typeof(MapperProfiles).Assembly);
 services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 services.AddTransient<IOrderRepository, OrderRepository>();
 services.AddTransient<IBillPaymentRepository, BillPaymentRepository>();
+services.AddTransient<IAddressRepository, AddressRepository>();
+services.AddTransient<IUserRepository, UserRepository>();
+services.AddTransient<IImageRepository, ImageRepository>();
+services.AddTransient<IOrderDetailRepository, OrderDetailRepository>();
+services.AddTransient<ICategoryRepository, CategoryRepository>();
+services.AddTransient<IProductRepository, ProductRepository>();
 #endregion
 services.AddControllers()
            .AddJsonOptions(options =>

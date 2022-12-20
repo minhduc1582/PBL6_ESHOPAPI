@@ -9,7 +9,7 @@ namespace eshop_api.Services.Products
 {
     public interface ICategoryService
     {
-        List<Category> GetListCategory();
+        Task<List<Category>> GetListCategory();
         Task<Category> AddCategory(CreateUpdateCategory createCategory);
         Task<Category> UpdateCategory(CreateUpdateCategory updateCategory,int IdCategory);
         Task<bool> DeleteCateoryById(int Id);

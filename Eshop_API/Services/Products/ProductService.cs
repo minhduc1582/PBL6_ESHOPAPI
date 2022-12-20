@@ -9,18 +9,24 @@ using eshop_api.Services.Images;
 using eshop_api.Helpers.Mapper;
 using eshop_pbl6.Helpers.Products;
 using System.Text.Json;
+using Eshop_API.Repositories.Images;
+using Eshop_API.Repositories.Products;
 
 namespace eshop_api.Service.Products
 {
     public class ProductService : IProductService
     {
-        private readonly DataContext _context;
         private readonly IImageService _imageService;
+        private readonly IImageRepository _imageRepository;
+        private readonly IProductRepository _productRepository;
 
-        public ProductService(DataContext context, IImageService imageService)
+        public ProductService(IImageRepository imageRepository, 
+                            IImageService imageService,
+                            IProductRepository productRepository)
         {
-            _context = context;
             _imageService = imageService;
+            _imageRepository = imageRepository;
+            _productRepository = productRepository;
         }
 
         public async Task<ProductDto> AddProduct(CreateUpdateProductDto createProductDto)
@@ -40,14 +46,14 @@ namespace eshop_api.Service.Products
             product.IsDelete = false;
             product.Detail = createProductDto.Detail;
             product.CategoryId = createProductDto.IdCategory;
-            var resultProduct = _context.Products.Add(product);
-            await _context.SaveChangesAsync();
-            ProductDto productDto = ProductMapper.toProductDto(resultProduct.Entity);
+            var resultProduct = await _productRepository.Add(product);
+            await _productRepository.SaveChangesAsync();
+            ProductDto productDto = ProductMapper.toProductDto(resultProduct);
 
             if (createProductDto.ProductImages.Count > 0)
                 foreach (IFormFile item in createProductDto.ProductImages)
                 {
-                    var img = await _imageService.AddImage(item, resultProduct.Entity.Id);
+                    var img = await _imageService.AddImage(item, resultProduct.Id);
                     productDto.ImageUrl.Add(img.Url);
                 }
             return productDto;
@@ -55,11 +61,11 @@ namespace eshop_api.Service.Products
 
         public async Task<bool> DeleteProductById(int id)
         {
-            var product = _context.Products.FirstOrDefault(x => x.Id == id);
+            var product = await _productRepository.FirstOrDefault(x => x.Id == id);
             if (product != null)
             {
-                var result = _context.Products.Remove(product);
-                await _context.SaveChangesAsync();
+                await _productRepository.Remove(product);
+                await _productRepository.SaveChangesAsync();
                 return true;
             }
             return false;
@@ -67,8 +73,8 @@ namespace eshop_api.Service.Products
 
         public async Task<List<ProductDto>> GetListProduct(int sortOrder)
         {
-            var products = _context.Products.Where(p => p.Status == Status.Approved).ToList();
-            var imgaes = _context.Images.ToList();
+            var products = await _productRepository.Find(p => p.Status == Status.Approved);
+            var imgaes = await _imageRepository.GetAll();
             if(sortOrder!=0)
             {
                 switch(sortOrder)
@@ -96,7 +102,7 @@ namespace eshop_api.Service.Products
 
         public async Task<List<ProductDto>> GetProductsByIdCategory(int idCategory, int sortOrder)
         {
-            var products = _context.Products.Where(x => x.CategoryId == idCategory).ToList();
+            var products = await _productRepository.Find(x => x.CategoryId == idCategory);
             if(sortOrder!=0)
             {
                 switch(sortOrder)
@@ -118,7 +124,7 @@ namespace eshop_api.Service.Products
                 foreach (var item in products)
                 {
                     ProductDto productDto = ProductMapper.toProductDto(item);
-                    productDto.ImageUrl = _context.Images.Where(x => x.ProductID == item.Id).Select(x => x.Url).ToList();
+                    productDto.ImageUrl = (await _imageRepository.Find(x => x.ProductID == item.Id)).Select(x => x.Url).ToList();
                     productDtos.Add(productDto);
                 }
                 return await Task.FromResult(productDtos);
@@ -127,14 +133,14 @@ namespace eshop_api.Service.Products
         }
         public async Task<List<ProductDto>> GetProductsById(int idProduct)
         {
-            var products = _context.Products.Where(x => x.Id == idProduct).ToList();
+            var products = await _productRepository.Find(x => x.Id == idProduct);
             if (products != null)
             {
                 List<ProductDto> productDtos = new List<ProductDto>();
                 foreach (var item in products)
                 {
                     ProductDto productDto = ProductMapper.toProductDto(item);
-                    productDto.ImageUrl = _context.Images.Where(x => x.ProductID == item.Id).Select(x => x.Url).ToList();
+                    productDto.ImageUrl = (await _imageRepository.Find(x => x.ProductID == item.Id)).Select(x => x.Url).ToList();
                     productDtos.Add(productDto);
                 }
                 return await Task.FromResult(productDtos);
@@ -143,7 +149,7 @@ namespace eshop_api.Service.Products
         }
         public async Task<List<ProductDto>> GetProductsByName(string productName)
         {
-            var products = _context.Products.ToList();
+            var products = await _productRepository.GetAll();
             if (products != null && !String.IsNullOrEmpty(productName))
             {
                 productName.ToLower();
@@ -152,7 +158,7 @@ namespace eshop_api.Service.Products
                 foreach (var item in products)
                 {
                     ProductDto productDto = ProductMapper.toProductDto(item);
-                    productDto.ImageUrl = _context.Images.Where(x => x.ProductID == item.Id).Select(x => x.Url).ToList();
+                    productDto.ImageUrl = (await _imageRepository.Find(x => x.ProductID == item.Id)).Select(x => x.Url).ToList();
                     productDtos.Add(productDto);
                 }
                 return await Task.FromResult(productDtos);
@@ -162,7 +168,7 @@ namespace eshop_api.Service.Products
 
         public async Task<List<ProductDto>> FindProduct(string productName, int stockfirst, int stocklast, int idCategory, int idProduct)
         {
-            var products = _context.Products.ToList();
+            var products = await _productRepository.GetAll();
             if(idCategory != 0)
             {
                 products = products.Where(x => x.CategoryId == idCategory).ToList();
@@ -190,7 +196,7 @@ namespace eshop_api.Service.Products
                 foreach (var item in products)
                 {
                     ProductDto productDto = ProductMapper.toProductDto(item);
-                    productDto.ImageUrl = _context.Images.Where(x => x.ProductID == item.Id).Select(x => x.Url).ToList();
+                    productDto.ImageUrl = (await _imageRepository.Find(x => x.ProductID == item.Id)).Select(x => x.Url).ToList();
                     productDtos.Add(productDto);
                 }
                 return await Task.FromResult(productDtos);
@@ -204,10 +210,9 @@ namespace eshop_api.Service.Products
         // }        
         public async Task<Product> UpdateProduct(CreateUpdateProductDto updateProductDto, int IdProduct)
         {
-            var product = _context.Products.FirstOrDefault(x => x.Id == IdProduct);
+            var product = await _productRepository.FirstOrDefault(x => x.Id == IdProduct);
             if (product != null)
             {
-                product.Code = updateProductDto.Name + (_context.Products.OrderByDescending(x => x.Id).Take(1).ToList()[0].Id + 1) + DateTime.Today;
                 product.Status = Status.Pending;
                 product.Name = updateProductDto.Name;
                 product.Keyword = updateProductDto.Keyword;
@@ -220,9 +225,9 @@ namespace eshop_api.Service.Products
                 product.Color = updateProductDto.Color;
                 product.IsDelete = false;
                 product.Detail = updateProductDto.Detail;
-                var resultProduct = _context.Products.Add(product);
-                _context.SaveChanges();
-                return await Task.FromResult(resultProduct.Entity);
+                var resultProduct = await _productRepository.Add(product);
+                await _productRepository.SaveChangesAsync();
+                return await Task.FromResult(resultProduct);
             }
             return new Product();
         }
@@ -230,8 +235,8 @@ namespace eshop_api.Service.Products
         public async Task<ProductDto> GetProductById(int IdProduct)
         {
             try{
-                var product = _context.Products.FirstOrDefault(x => x.Id == IdProduct);
-                var listImgae = _context.Images.Where(x => x.ProductID == IdProduct).Select(s => s.Url).ToList();
+                var product = await _productRepository.FirstOrDefault(x => x.Id == IdProduct);
+                var listImgae = (await _imageRepository.Find(x => x.ProductID == IdProduct)).Select(s => s.Url).ToList();
                 var json = JsonSerializer.Serialize(product);
                 var result = JsonSerializer.Deserialize<ProductDto>(json);
                 result.ImageUrl = listImgae;
