@@ -15,6 +15,8 @@ using Eshop_API.Services.VNPAY;
 using Eshop_API.Models.DTO.VNPAY;
 using Eshop_API.Helpers.Orders;
 using Eshop_API.Services.Identities;
+using Nest;
+using static Nest.JoinField;
 
 namespace eshop_api.Controllers.Products
 {
@@ -170,9 +172,39 @@ namespace eshop_api.Controllers.Products
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.ErrorException, ex.Message, "null"));
             }
         }
+        [HttpPut("update-cart")]
+        public async Task<IActionResult> UpdateCart(List<OrderDetailDTO> orderDetailDTO)
+        {
+            try
+            {
+                string remoteIpAddress = HttpContext.Connection.RemoteIpAddress.ToString();
+                string urlOrigin = "";
+                if (HttpContext.Request.Headers.ContainsKey("Origin"))
+                {
+                    urlOrigin = Request.Headers["Origin"];
+                    // Do stuff with the values... probably .FirstOrDefault()
+                }
+                //var serId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                var handler = new JwtSecurityTokenHandler();
+                var jwtSecurityToken = handler.ReadJwtToken(token);
+                string idUser = jwtSecurityToken.Claims.First(claim => claim.Type == "Id").Value;
+                // var claimsIdentity = (ClaimsIdentity)User.Identity;
+                // var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+                // int userId = Convert.ToInt32(claim.Value);
+                var result = await _orderService.UpdateCart(orderDetailDTO, int.Parse(idUser));
+                //result.Id
+
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "thêm dữ liệu thành công", result));
+            }
+            catch (Exception ex)
+            {
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.ErrorException, ex.Message, "null"));
+            }
+        }    
         [HttpPut("del-from-cart")]
         [Authorize(EshopPermissions.OrderPermissions.Edit)]
-        public async Task<IActionResult> DelFromCart(int idProduct, int quantity)
+        public async Task<IActionResult> DelFromCart(int idProduct)
         {
             try{
                 //var serId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -183,7 +215,7 @@ namespace eshop_api.Controllers.Products
                 // var claimsIdentity = (ClaimsIdentity)User.Identity;
                 // var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
                 // int userId = Convert.ToInt32(claim.Value);
-                var result = await _orderService.DelFromCart(idProduct, int.Parse(idUser), quantity);
+                var result = await _orderService.DelFromCart(idProduct, int.Parse(idUser));
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "xóa dữ liệu thành công", result));
             }
             catch(Exception ex)

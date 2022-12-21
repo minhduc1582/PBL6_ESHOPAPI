@@ -21,6 +21,7 @@ using AutoMapper;
 using Eshop_API.Repositories.Orders;
 using Eshop_API.Repositories.Products;
 using Eshop_API.Repositories.Identities;
+using CloudinaryDotNet.Actions;
 
 namespace eshop_api.Services.Orders
 {
@@ -63,7 +64,7 @@ namespace eshop_api.Services.Orders
             {
                 var product =await _productRepository.FirstOrDefault(x=> x.Id == i.ProductId);
                 temp += i.Quantity * product.Price;
-                await DelFromCart(i.ProductId, idUser, i.Quantity);
+                await DelFromCart(i.ProductId, idUser);
             }
             Order order = new Order();
             order.Status = Status.Pending.ToString();
@@ -242,7 +243,7 @@ namespace eshop_api.Services.Orders
             return false;
         }
 
-        public async Task<Order> DelFromCart(int idProduct, int idUser, int quantity)
+        public async Task<Order> DelFromCart(int idProduct, int idUser)
         {
             List<Order> order = await GetOrderByStatusOfEachUser(idUser, 1);
             foreach(Order i in order)
@@ -252,18 +253,7 @@ namespace eshop_api.Services.Orders
                 {
                     if(j.ProductId == idProduct)
                     {
-                        int temp = j.Quantity - quantity;
-                        if (temp == 0)
-                            await _orderDetailService.DeleteOrderDetail(j.Id);
-                        else
-                        {
-                            CreateUpdateOrderDetail createUpdateOrderDetail = new CreateUpdateOrderDetail();
-                            createUpdateOrderDetail.idOrder = j.OrderId;
-                            createUpdateOrderDetail.ProductId = j.ProductId;
-                            createUpdateOrderDetail.Quantity = temp;
-                            createUpdateOrderDetail.Note = j.Note;
-                            await _orderDetailService.UpdateOrderDetail(createUpdateOrderDetail, j.Id);
-                        }
+                        await _orderDetailService.DeleteOrderDetail(j.Id);
                     }
                 }
                 await UpdateTotal(i.Id);
@@ -277,6 +267,17 @@ namespace eshop_api.Services.Orders
         public async Task<List<Order>> GetListOrders()
         {
             return await _orderRepository.GetAll();
+        }
+
+        public async Task<Order> UpdateCart(List<OrderDetailDTO> orderDetailDTOs, int idUser)
+        {
+            var order = await _orderRepository.FirstOrDefault(x => x.UserId == idUser && x.Status == Status.Cart.ToString());
+            foreach (OrderDetailDTO i in orderDetailDTOs)
+            {
+                await DelFromCart(i.ProductId, idUser);
+                await _orderDetailService.AddOrderDetail(i, order.Id);
+            }
+            return order;
         }
 
         public async Task<OrderView> GetOrderById(Guid idOrder)

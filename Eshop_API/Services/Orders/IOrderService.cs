@@ -22,7 +22,8 @@ namespace eshop_api.Services.Orders
         Task<bool> DeleteOrderById(Guid idOrder); //Xóa đơn hàng theo id
         Task<bool> UpdateTotal(Guid idOrder); //Cập nhật tổng tiền giỏ hàng
         Task<Order> AddToCart(OrderDetailDTO orderDetailDTOs, string username); //Thêm vào giỏ hàng
-        Task<Order> DelFromCart(int idProduct, int idUser, int quantity); //Xóa khỏi giỏ hàng
+        Task<Order> DelFromCart(int idProduct, int idUser); //Xóa khỏi giỏ hàng
+        Task<Order> UpdateCart(List<OrderDetailDTO> orderDetailDTOs, int idUser); //Cập nhật giỏ hàng
         
 
     }
