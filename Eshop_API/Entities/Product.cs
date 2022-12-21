@@ -14,7 +14,6 @@ namespace eshop_api.Entities
             Images = new List<Image>();
             OrderDetails = new List<OrderDetail>();
             Comments = new List<Comment>();
-            Detail = new Dictionary<string, object>();
         }
 
         [Key]
@@ -33,7 +32,7 @@ namespace eshop_api.Entities
         public string? Description{get;set;}
         public string Color{get;set;}
         public bool IsDelete{get;set;}
-        public Dictionary<string, object> Detail{get;set;} = new Dictionary<string, object>();
+        public string DetailProduct{get;set;}
         [ForeignKey("Category")]
         public int CategoryId{get;set;}
         public virtual Category Category{get;set;}

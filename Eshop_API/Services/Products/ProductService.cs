@@ -44,7 +44,7 @@ namespace eshop_api.Service.Products
             product.Description = createProductDto.Description;
             product.Color = createProductDto.Color;
             product.IsDelete = false;
-            product.Detail = createProductDto.Detail;
+            product.DetailProduct = createProductDto.Detail;
             product.CategoryId = createProductDto.IdCategory;
             var resultProduct = await _productRepository.Add(product);
             await _productRepository.SaveChangesAsync();
@@ -73,7 +73,7 @@ namespace eshop_api.Service.Products
 
         public async Task<List<ProductDto>> GetListProduct(int sortOrder)
         {
-            var products = await _productRepository.Find(p => p.Status == Status.Approved);
+            var products = await _productRepository.GetAll();
             var imgaes = await _imageRepository.GetAll();
             if(sortOrder!=0)
             {
@@ -224,7 +224,7 @@ namespace eshop_api.Service.Products
                 product.Description = updateProductDto.Description;
                 product.Color = updateProductDto.Color;
                 product.IsDelete = false;
-                product.Detail = updateProductDto.Detail;
+                product.DetailProduct = updateProductDto.Detail;
                 var resultProduct = await _productRepository.Add(product);
                 await _productRepository.SaveChangesAsync();
                 return await Task.FromResult(resultProduct);
