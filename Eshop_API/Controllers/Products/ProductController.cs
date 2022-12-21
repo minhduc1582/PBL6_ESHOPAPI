@@ -38,6 +38,7 @@ namespace eshop_api.Controllers.Products
             _sentryHub = sentryHub;
         }
         [HttpGet("get-list-product")]
+        [Authorize(EshopPermissions.ProductPermissions.GetList)]
         public async Task<ActionResult> GetListProduct([FromQuery]PagedAndSortedResultRequestDto input, int sortOrder){
                 var childSpan = _sentryHub.GetSpan()?.StartChild("additional-work");
             try{

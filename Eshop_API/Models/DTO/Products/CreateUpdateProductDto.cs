@@ -27,8 +27,7 @@ namespace eshop_api.Models.DTO.Products
         public string Description{get;set;}
         [MaxLength(20)]
         public string Color{get;set;}
-        [RegularExpression("{('\\w+':(\\d+|'\\w+'|true|false|null))+}\\]",ErrorMessage = "không đúng format json")]
-        public Dictionary<string, object> Detail{get;set;}
+        public string Detail{get;set;}
         [Required]
         [DataType(DataType.Upload,ErrorMessage = "Ảnh không đúng định dạng")]
         public IFormFileCollection ProductImages{get;set;}

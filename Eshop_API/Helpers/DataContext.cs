@@ -17,18 +17,10 @@ namespace eshop_api.Helpers
             base.OnModelCreating(builder);
 
             builder.Entity<RoleInPermission>().HasKey(UserInRole => new {
-            UserInRole.RoleId, UserInRole.PermissionId
+                UserInRole.RoleId, UserInRole.PermissionId
             });
-
-            builder.Entity<Product>(b => {
-                b.Property(u => u.Detail)
-                .HasConversion(
-                    d => JsonConvert.SerializeObject(d, Formatting.None),
-                    s => s == null ? new Dictionary<string, object>()
-                        : JsonConvert.DeserializeObject<Dictionary<string, object>>(s)
-                )
-                .HasMaxLength(4000)
-                .IsRequired();
+            builder.Entity<Vote>().HasKey(Votes => new {
+                Votes.ProductId, Votes.UserId
             });
         }
         public DbSet<User> AppUsers {get; set;}
@@ -47,5 +39,6 @@ namespace eshop_api.Helpers
         public DbSet<Image> Images{get;set;}
         public DbSet<History> Histories{get;set;}
         public DbSet<BillPay> BillPays{get;set;}
+        public DbSet<Vote> Votes{get;set;}
     }
 }
