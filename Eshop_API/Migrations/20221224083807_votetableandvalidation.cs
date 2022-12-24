@@ -5,10 +5,43 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace eshop_api.Migrations
 {
-    public partial class fixValidattion : Migration
+    public partial class votetableandvalidation : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+
+            migrationBuilder.AddColumn<int>(
+                name: "level",
+                table: "Categories",
+                type: "int",
+                nullable: false,
+                defaultValue: 0);
+
+            migrationBuilder.AlterColumn<int>(
+                name: "Gender",
+                table: "AppUsers",
+                type: "int",
+                nullable: true,
+                oldClrType: typeof(int),
+                oldType: "int");
+
+            migrationBuilder.CreateTable(
+                name: "Votes",
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    Star = table.Column<float>(type: "float", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Votes", x => new { x.ProductId, x.UserId });
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+            migrationBuilder.DropColumn(
+                name: "Detail",
+                table: "Products");
+
             migrationBuilder.DropColumn(
                 name: "Check",
                 table: "Orders");
@@ -34,51 +67,55 @@ namespace eshop_api.Migrations
                 table: "AppUsers",
                 newName: "Phone");
 
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "CheckedAt",
-                table: "Orders",
-                type: "datetime(6)",
-                nullable: false,
-                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                oldClrType: typeof(string),
-                oldType: "longtext",
-                oldNullable: true)
-                .OldAnnotation("MySql:CharSet", "utf8mb4");
+            migrationBuilder.AddColumn<string>(
+                name: "DetailProduct",
+                table: "Products",
+                type: "longtext",
+                nullable: false)
+                .Annotation("MySql:CharSet", "utf8mb4");
 
-            migrationBuilder.AddColumn<DateTime>(
-                name: "CreateAt",
-                table: "Orders",
-                type: "datetime(6)",
-                nullable: false,
-                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Votes");
+
+            migrationBuilder.DropColumn(
+                name: "DetailProduct",
+                table: "Products");
+
             migrationBuilder.DropColumn(
                 name: "CreateAt",
                 table: "Orders");
+
+            migrationBuilder.DropColumn(
+                name: "level",
+                table: "Categories");
 
             migrationBuilder.RenameColumn(
                 name: "Phone",
                 table: "AppUsers",
                 newName: "Phone2");
 
-            migrationBuilder.AlterColumn<string>(
-                name: "CheckedAt",
-                table: "Orders",
-                type: "longtext",
-                nullable: true,
-                oldClrType: typeof(DateTime),
-                oldType: "datetime(6)")
+            migrationBuilder.AddColumn<string>(
+                name: "Detail",
+                table: "Products",
+                type: "varchar(4000)",
+                maxLength: 4000,
+                nullable: false,
+                defaultValue: "")
                 .Annotation("MySql:CharSet", "utf8mb4");
 
-            migrationBuilder.AddColumn<string>(
-                name: "Check",
-                table: "Orders",
-                type: "longtext",
-                nullable: true)
-                .Annotation("MySql:CharSet", "utf8mb4");
+            migrationBuilder.AlterColumn<int>(
+                name: "Gender",
+                table: "AppUsers",
+                type: "int",
+                nullable: false,
+                defaultValue: 0,
+                oldClrType: typeof(int),
+                oldType: "int",
+                oldNullable: true);
 
             migrationBuilder.AddColumn<string>(
                 name: "Address1",

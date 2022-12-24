@@ -2,6 +2,8 @@
 using eshop_api.Entities;
 using eshop_api.Models.DTO.Order;
 using eshop_api.Models.DTO.Products;
+using Eshop_API.Entities;
+using Eshop_API.Models.DTO.Products;
 
 namespace Eshop_API.Helpers.Profiles
 {
@@ -12,6 +14,7 @@ namespace Eshop_API.Helpers.Profiles
             CreateMap<Product, ProductDto>();
             CreateMap<Order, OrderDto>();
             CreateMap<Order, OrderView>();
+            CreateMap<Vote, VoteDto>();
         }
     }
 }
