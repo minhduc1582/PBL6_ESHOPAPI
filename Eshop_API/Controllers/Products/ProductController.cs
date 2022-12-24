@@ -20,7 +20,6 @@ namespace eshop_api.Controllers.Products
     public class ProductController : BaseController
     {
         private IHubContext <MessageHub,IMessageHubClient> _messageHub;
-        private readonly DataContext _context;
         private readonly IProductService _productService;
         ILogger<ProductController> _logger;
         private readonly IHub _sentryHub;
@@ -31,7 +30,6 @@ namespace eshop_api.Controllers.Products
                                 ILogger<ProductController> logger,
                                 IHub sentryHub)
         {
-            _context = context;
             _productService = productService;
             _messageHub = messageHub;
             _logger = logger;
@@ -114,6 +112,24 @@ namespace eshop_api.Controllers.Products
                     
                 }
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.BadRequest,"Thêm dữ liệu thất bại","null"));
+            }
+            catch(Exception ex){
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.ErrorException,ex.Message,"null"));
+            }
+        }
+        [HttpPost("add-product")]
+        [Authorize(EshopPermissions.ProductPermissions.Edit)]
+        public async Task<IActionResult> UpdateProduct([FromForm]CreateUpdateProductDto createProductDto,int idproduct){
+            try{
+                if(createProductDto != null){
+                    var result  = await _productService.UpdateProduct(createProductDto, idproduct);
+                    if(result != null){
+                       // await _elasticClient.IndexDocumentAsync(createProductDto);
+                        return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,"Sửa dữ liệu thành công",result));
+                    }
+                    
+                }
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.BadRequest,"Sửa dữ liệu thất bại","null"));
             }
             catch(Exception ex){
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.ErrorException,ex.Message,"null"));
