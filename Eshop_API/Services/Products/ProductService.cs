@@ -195,7 +195,7 @@ namespace eshop_api.Service.Products
                 IsDelete = x.IsDelete,
                 DetailProduct = x.DetailProduct,
                 CategoryId = x.CategoryId
-            }).OrderByDescending(x => x.ExportQuantity).ToList();
+            }).OrderByDescending(x => x.ExportQuantity).Take(8).ToList();
             var bestPC = laptop.Join(categoriesPC, x => x.CategoryId, y => y.Id, (x, y) => new Product
             {
                 Id = x.Id,
@@ -214,7 +214,7 @@ namespace eshop_api.Service.Products
                 IsDelete = x.IsDelete,
                 DetailProduct = x.DetailProduct,
                 CategoryId = x.CategoryId
-            }).OrderByDescending(x => x.ExportQuantity).ToList();
+            }).OrderByDescending(x => x.ExportQuantity).Take(8).ToList();
             var bestScreen = laptop.Join(categoriesMH, x => x.CategoryId, y => y.Id, (x, y) => new Product
             {
                 Id = x.Id,
@@ -233,7 +233,7 @@ namespace eshop_api.Service.Products
                 IsDelete = x.IsDelete,
                 DetailProduct = x.DetailProduct,
                 CategoryId = x.CategoryId
-            }).OrderByDescending(x => x.ExportQuantity).ToList();
+            }).OrderByDescending(x => x.ExportQuantity).Take(8).ToList();
             var bestGear = laptop.Join(categoriesGear, x => x.CategoryId, y => y.Id, (x, y) => new Product
             {
                 Id = x.Id,
@@ -252,7 +252,7 @@ namespace eshop_api.Service.Products
                 IsDelete = x.IsDelete,
                 DetailProduct = x.DetailProduct,
                 CategoryId = x.CategoryId
-            }).OrderByDescending(x => x.ExportQuantity).ToList();
+            }).OrderByDescending(x => x.ExportQuantity).Take(8).ToList();
 
             //var bestLaptop = await _productRepository.Find(x => x.CategoryId == 1);
             //bestLaptop = bestLaptop.Where().OrderByDescending(x => x.ExportQuantity).ToList();
