@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using eshop_pbl6.Helpers.Products;
+using System.Text.Json.Serialization;
 
 namespace eshop_api.Entities
 {
@@ -35,9 +36,13 @@ namespace eshop_api.Entities
         public string DetailProduct{get;set;}
         [ForeignKey("Category")]
         public int CategoryId{get;set;}
+        [JsonIgnore]
         public virtual Category Category{get;set;}
+        [JsonIgnore]
         public virtual List<Image> Images{get;set;}
+        [JsonIgnore]
         public virtual List<OrderDetail> OrderDetails{get;set;}
+        [JsonIgnore]
         public virtual List<Comment> Comments{get;set;}
     }
 }
