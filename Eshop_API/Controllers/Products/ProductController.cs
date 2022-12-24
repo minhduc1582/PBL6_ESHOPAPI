@@ -131,6 +131,21 @@ namespace eshop_api.Controllers.Products
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.ErrorException,ex.Message,"null"));
             }
         }
+        [HttpGet("get-best-seller")]
+        public async Task<IActionResult> GetBestSeller()
+        {
+            try
+            {
+                var result = await _productService.GetBestSeller();
+                if (result != null)
+                    return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "Lấy dữ liệu thành công", result));
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.ErrorData, "Thêm dữ liệu thất bại", "null"));
+            }
+            catch (Exception ex)
+            {
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.ErrorException, ex.Message, "null"));
+            }
+        }
         [HttpDelete("delete-product-by-id")]
         [Authorize(EshopPermissions.ProductPermissions.Delete)]
         public async Task<IActionResult> DelProductById(int idProduct){

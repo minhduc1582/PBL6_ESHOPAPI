@@ -16,8 +16,7 @@ namespace eshop_api.Service.Products
         Task<ProductDto> AddProduct(CreateUpdateProductDto createProductDto);
         Task<Product> UpdateProduct(CreateUpdateProductDto createProductDto, int IdProduct);
         Task<bool> DeleteProductById(int id);
-
         Task<ProductDto> GetProductById(int IdProduct);
-
+        Task<List<List<Product>>> GetBestSeller();
     }
 }

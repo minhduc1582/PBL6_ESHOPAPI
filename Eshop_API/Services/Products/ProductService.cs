@@ -19,14 +19,16 @@ namespace eshop_api.Service.Products
         private readonly IImageService _imageService;
         private readonly IImageRepository _imageRepository;
         private readonly IProductRepository _productRepository;
-
+        private readonly ICategoryRepository _categoryRepository;
         public ProductService(IImageRepository imageRepository, 
                             IImageService imageService,
-                            IProductRepository productRepository)
+                            IProductRepository productRepository,
+                            ICategoryRepository categoryRepository)
         {
             _imageService = imageService;
             _imageRepository = imageRepository;
             _productRepository = productRepository;
+            _categoryRepository = categoryRepository;  
         }
 
         public async Task<ProductDto> AddProduct(CreateUpdateProductDto createProductDto)
@@ -164,6 +166,112 @@ namespace eshop_api.Service.Products
                 return await Task.FromResult(productDtos);
             }
             throw null;
+        }
+
+        public async Task<List<List<Product>>> GetBestSeller()
+        {
+            var bestSeller = new List<List<Product>>();
+            var laptop = await _productRepository.GetAll();
+            var categories = await _categoryRepository.GetAll();
+            var categoriesLaptop = categories.Where(x=> x.Code.StartsWith("LT"));
+            var categoriesPC = categories.Where(x => x.Code.StartsWith("PC"));
+            var categoriesMH = categories.Where(x => x.Code.StartsWith("MH"));
+            var categoriesGear = categories.Where(x => x.Code.StartsWith("GMGR"));
+            var bestLaptop = laptop.Join(categoriesLaptop, x => x.CategoryId, y => y.Id, (x, y) => new Product
+            {
+                Id = x.Id,
+                Code = x.Code,
+                Status = x.Status,
+                Name = x.Name,
+                Keyword = x.Keyword,
+                AvtImageUrl = x.AvtImageUrl,
+                Price = x.Price,
+                Discount = x.Discount,
+                ExportQuantity = x.ExportQuantity,
+                ImportQuantity = x.ImportQuantity,
+                Weight = x.Weight,
+                Description = x.Description,
+                Color = x.Color,
+                IsDelete = x.IsDelete,
+                DetailProduct = x.DetailProduct,
+                CategoryId = x.CategoryId
+            }).OrderByDescending(x => x.ExportQuantity).ToList();
+            var bestPC = laptop.Join(categoriesPC, x => x.CategoryId, y => y.Id, (x, y) => new Product
+            {
+                Id = x.Id,
+                Code = x.Code,
+                Status = x.Status,
+                Name = x.Name,
+                Keyword = x.Keyword,
+                AvtImageUrl = x.AvtImageUrl,
+                Price = x.Price,
+                Discount = x.Discount,
+                ExportQuantity = x.ExportQuantity,
+                ImportQuantity = x.ImportQuantity,
+                Weight = x.Weight,
+                Description = x.Description,
+                Color = x.Color,
+                IsDelete = x.IsDelete,
+                DetailProduct = x.DetailProduct,
+                CategoryId = x.CategoryId
+            }).OrderByDescending(x => x.ExportQuantity).ToList();
+            var bestScreen = laptop.Join(categoriesMH, x => x.CategoryId, y => y.Id, (x, y) => new Product
+            {
+                Id = x.Id,
+                Code = x.Code,
+                Status = x.Status,
+                Name = x.Name,
+                Keyword = x.Keyword,
+                AvtImageUrl = x.AvtImageUrl,
+                Price = x.Price,
+                Discount = x.Discount,
+                ExportQuantity = x.ExportQuantity,
+                ImportQuantity = x.ImportQuantity,
+                Weight = x.Weight,
+                Description = x.Description,
+                Color = x.Color,
+                IsDelete = x.IsDelete,
+                DetailProduct = x.DetailProduct,
+                CategoryId = x.CategoryId
+            }).OrderByDescending(x => x.ExportQuantity).ToList();
+            var bestGear = laptop.Join(categoriesGear, x => x.CategoryId, y => y.Id, (x, y) => new Product
+            {
+                Id = x.Id,
+                Code = x.Code,
+                Status = x.Status,
+                Name = x.Name,
+                Keyword = x.Keyword,
+                AvtImageUrl = x.AvtImageUrl,
+                Price = x.Price,
+                Discount = x.Discount,
+                ExportQuantity = x.ExportQuantity,
+                ImportQuantity = x.ImportQuantity,
+                Weight = x.Weight,
+                Description = x.Description,
+                Color = x.Color,
+                IsDelete = x.IsDelete,
+                DetailProduct = x.DetailProduct,
+                CategoryId = x.CategoryId
+            }).OrderByDescending(x => x.ExportQuantity).ToList();
+
+            //var bestLaptop = await _productRepository.Find(x => x.CategoryId == 1);
+            //bestLaptop = bestLaptop.Where().OrderByDescending(x => x.ExportQuantity).ToList();
+            //var bestPC = await _productRepository.Find(x=> x.CategoryId == 2);
+            //bestPC = bestPC.OrderByDescending(x => x.ExportQuantity).ToList();
+            //var bestScreen = await _productRepository.Find(x => x.CategoryId == 3);
+            //bestScreen = bestScreen.OrderByDescending(x => x.ExportQuantity).ToList();
+            //var bestGear = await _productRepository.Find(x => x.CategoryId == 5);
+            //bestGear = bestGear.OrderByDescending(x => x.ExportQuantity).ToList();
+            bestSeller.Add(new List<Product>());
+            foreach (var i in bestLaptop) bestSeller[0].Add(i);
+            bestSeller.Add(new List<Product>());
+            foreach (var i in bestPC) bestSeller[1].Add(i);
+            bestSeller.Add(new List<Product>());
+            foreach (var i in bestScreen) bestSeller[2].Add(i);
+            bestSeller.Add(new List<Product>());
+            foreach (var i in bestGear) bestSeller[3].Add(i);
+
+            return bestSeller;
         }
 
         public async Task<List<ProductDto>> FindProduct(string productName, int stockfirst, int stocklast, int idCategory, int idProduct)
