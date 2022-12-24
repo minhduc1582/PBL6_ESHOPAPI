@@ -11,8 +11,8 @@ using eshop_api.Helpers;
 namespace eshop_api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221221171730_VoteTable")]
-    partial class VoteTable
+    [Migration("20221224083807_votetableandvalidation")]
+    partial class votetableandvalidation
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

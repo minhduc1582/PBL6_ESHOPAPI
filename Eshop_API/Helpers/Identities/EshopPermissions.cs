@@ -66,5 +66,11 @@ namespace eshop_pbl6.Helpers.Identities
             public const string Default = GroupName + ".Statis";
             public const string Get = Default + ".Get";
         }
+        public static class Votes
+        {
+            public const string Default = GroupName + ".Votes";
+            public const string Get = Default + ".Get";
+            public const string Add = Default + ".Add";
+        }
     }
 }
