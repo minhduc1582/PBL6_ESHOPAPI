@@ -37,6 +37,7 @@ using Eshop_API.Repositories.Identities;
 using Eshop_API.Repositories.Images;
 using Eshop_API.Repositories.Products;
 using Eshop_API.Helpers.Profiles;
+using Eshop_API.Services.Comments;
 
 var builder = WebApplication.CreateBuilder(args);
 // configur log
@@ -136,6 +137,7 @@ services.AddScoped<IUserService, UserService>();
 services.AddScoped<IJwtUtils, JwtUtils>();
 services.AddTransient<IOrderService, OderService>();
 services.AddTransient<IOderDetailService, OderDetailService>();
+services.AddTransient<ICommentService, CommentService>();
 services.AddTransient<IAddressService, AddressService>();
 services.AddTransient<IVnPayService, VnPayService>();
 services.AddAutoMapper(typeof(MapperProfiles).Assembly);
