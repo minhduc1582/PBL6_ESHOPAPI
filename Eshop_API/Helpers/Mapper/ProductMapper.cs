@@ -21,6 +21,7 @@ namespace eshop_api.Helpers.Mapper
             productDto.Discount = (double)product.Discount;
             productDto.Weight = product.Weight;
             productDto.Description = product.Description;
+            productDto.DetailProduct = product.DetailProduct;
             productDto.Color = product.Color;
             return productDto;
         }
