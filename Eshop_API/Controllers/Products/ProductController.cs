@@ -117,7 +117,7 @@ namespace eshop_api.Controllers.Products
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.ErrorException,ex.Message,"null"));
             }
         }
-        [HttpPost("add-product")]
+        [HttpPost("edit-product")]
         [Authorize(EshopPermissions.ProductPermissions.Edit)]
         public async Task<IActionResult> UpdateProduct([FromForm]CreateUpdateProductDto createProductDto,int idproduct){
             try{
