@@ -263,13 +263,17 @@ namespace eshop_api.Service.Products
             //var bestGear = await _productRepository.Find(x => x.CategoryId == 5);
             //bestGear = bestGear.OrderByDescending(x => x.ExportQuantity).ToList();
             bestSeller.Add(new List<Product>());
-            foreach (var i in bestLaptop) bestSeller[0].Add(i);
+            //foreach (var i in bestLaptop) bestSeller[0].Add(i);
+            bestSeller[0].AddRange(bestLaptop);
             bestSeller.Add(new List<Product>());
-            foreach (var i in bestPC) bestSeller[1].Add(i);
+            //foreach (var i in bestPC) bestSeller[1].Add(i);
+            bestSeller[1].AddRange(bestPC);
             bestSeller.Add(new List<Product>());
-            foreach (var i in bestScreen) bestSeller[2].Add(i);
+            //foreach (var i in bestScreen) bestSeller[2].Add(i);
+            bestSeller[2].AddRange(bestScreen);
             bestSeller.Add(new List<Product>());
-            foreach (var i in bestGear) bestSeller[3].Add(i);
+            //foreach (var i in bestGear) bestSeller[3].Add(i);
+            bestSeller[3].AddRange(bestGear);
 
             return bestSeller;
         }
