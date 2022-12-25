@@ -18,6 +18,7 @@ namespace eshop_api.Helpers.Mapper
             orderDetailDTOs.ProductId = orderDetail.ProductId;
             orderDetailDTOs.AvtImageUrl = product.AvtImageUrl;
             orderDetailDTOs.ProductName = product.Name;
+            orderDetailDTOs.StorageQuantity = product.ImportQuantity - product.ExportQuantity;
             orderDetailDTOs.Price = product.Price;
             orderDetailDTOs.Quantity = orderDetail.Quantity;
             orderDetailDTOs.Note = orderDetail.Note;
