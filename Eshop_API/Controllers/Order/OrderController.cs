@@ -236,6 +236,20 @@ namespace eshop_api.Controllers.Products
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.ErrorException, ex.Message, "null"));
             }
         }
+        [HttpPut("cancel-order")]
+        [Authorize(EshopPermissions.OrderPermissions.Edit)]
+        public async Task<IActionResult> CancelOrder(Guid idOrder, string note)
+        {
+            try
+            {
+                var result = await _orderService.CancelOrder(idOrder, note);
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "cập nhật dữ liệu thành công", result));
+            }
+            catch (Exception ex)
+            {
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.ErrorException, ex.Message, "null"));
+            }
+        }
         [HttpPut("update-order")]
         public async Task<IActionResult> UpdateOrder(CreateUpdateOrder createUpdateOrder, Guid idOrder)
         {

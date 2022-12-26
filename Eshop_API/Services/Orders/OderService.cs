@@ -64,6 +64,10 @@ namespace eshop_api.Services.Orders
             {
                 var product =await _productRepository.FirstOrDefault(x=> x.Id == i.ProductId);
                 temp += i.Quantity * product.Price;
+                product.ImportQuantity -= i.Quantity;
+                product.ExportQuantity += i.Quantity;
+                await _productRepository.Update(product);
+                await _productRepository.SaveChangesAsync();
                 await DelFromCart(i.ProductId, idUser);
             }
             Order order = new Order();
@@ -119,7 +123,7 @@ namespace eshop_api.Services.Orders
                     order.Total = i.Total;
                     order.Note = i.Note;
                     order.CheckedAt = i.CheckedAt;
-                    order.CheckedAt = i.CreateAt;
+                    order.CreateAt = i.CreateAt;
                     order.CheckedBy = i.CheckedBy;
                     order.CheckedComment = i.CheckedComment;
                     order.UserId = i.UserId;
@@ -229,6 +233,31 @@ namespace eshop_api.Services.Orders
                 }
             }
             return list;
+        }
+
+        public async Task<OrderDto> CancelOrder(Guid idOrder, string note)
+        {
+            var order = await _orderRepository.FirstOrDefault(x => x.Id == idOrder);
+            if(order != null)
+            {
+                List<OrderDetail> orderDetail = await _orderDetailService.GetOrderDetailsByOrderId(idOrder);
+                foreach(var i in orderDetail)
+                {
+                    var product = await _productRepository.FirstOrDefault(x => x.Id == i.ProductId);
+                    product.ImportQuantity += i.Quantity;
+                    product.ExportQuantity -= i.Quantity;
+                    await _productRepository.Update(product);
+                    await _productRepository.SaveChangesAsync();
+                }
+                order.Status = Status.Cancel.ToString();
+                if (note != null) order.Note = note;
+                order.CheckedAt = DateTime.Now;
+                await _orderRepository.Update(order);
+                await _orderRepository.SaveChangesAsync();
+                OrderDto orderDto = _mapper.Map<Order, OrderDto>(order);
+                return orderDto;
+            }
+            throw null;
         }
 
         public async Task<bool> DeleteOrderById(Guid idOrder)
