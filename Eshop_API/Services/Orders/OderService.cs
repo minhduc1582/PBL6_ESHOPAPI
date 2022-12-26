@@ -306,6 +306,7 @@ namespace eshop_api.Services.Orders
                 await DelFromCart(i.ProductId, idUser);
                 await _orderDetailService.AddOrderDetail(i, order.Id);
             }
+            await UpdateTotal(order.Id);
             return order;
         }
 
