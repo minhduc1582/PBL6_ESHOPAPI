@@ -22,11 +22,6 @@ namespace eshop_pbl6.Services.Identities
             _context = context;
         }
 
-        public Task<bool> ChangePassword(string passwordOld, string passwordNew)
-        {
-            throw new NotImplementedException();
-        }
-
         public async Task<List<Permission>> GetAllPermission()
         {
             return await Task.FromResult(_context.Permissions.ToList());
@@ -73,7 +68,23 @@ namespace eshop_pbl6.Services.Identities
 
         public async Task<bool> Login(string username,string password)
         {
-            throw new NotImplementedException();
+            username = username.ToLower().Trim();
+            var currentUser = _context.AppUsers
+                .FirstOrDefault(u => u.Username.ToLower().Trim() == username);
+            if (currentUser == null)
+            {
+                return false;
+            }
+            using var hmac = new HMACSHA512(currentUser.PasswordSalt);
+            var passwordBytes = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
+            for (int i = 0; i < currentUser.PasswordHash.Length; i++)
+            {
+                if (currentUser.PasswordHash[i] != passwordBytes[i])
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         public async Task<User> Register(CreateUpdateUserDto create)
@@ -81,24 +92,19 @@ namespace eshop_pbl6.Services.Identities
             throw new NotImplementedException();
         }
         
-        public async Task<bool> ChangePassworrd(string username, string passwordOld, string passwordNew)
+        public async Task<bool> ChangePassword(string username, string passwordOld, string passwordNew)
         {
             if(await Login(username,passwordOld) == true){
                 var user = _context.AppUsers.FirstOrDefault(x =>x.Username.ToLower() == username.ToLower().Trim());
                 using var hmac = new HMACSHA512();
                 var passwordBytes = Encoding.UTF8.GetBytes(passwordNew);
                 user.PasswordSalt = hmac.Key;
-                user.PasswordSalt = hmac.ComputeHash(passwordBytes);
+                user.PasswordHash = hmac.ComputeHash(passwordBytes);
                 _context.AppUsers.Update(user);
                 await _context.SaveChangesAsync();
                 return true;
             }
             return false;
-        }
-
-        public Task<bool> Login(UserLogin userLogin)
-        {
-            throw new NotImplementedException();
         }
 
         public async Task<UserDto> UpdateUserById(UpdateUserDto userDto,int idUser)

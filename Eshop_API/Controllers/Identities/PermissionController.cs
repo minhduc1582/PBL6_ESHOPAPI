@@ -35,6 +35,20 @@ namespace eshop_pbl6.Controllers.Identities
             
         }
         [Authorize(EshopPermissions.ManagerPermissions.Get)]
+        [HttpGet("is-admin")]
+        public IActionResult isAdmin()
+        {
+            try
+            {
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,"Get dữ liệu thành công",true));
+            }
+            catch (Exception ex)
+            {
+                 return Ok(CommonReponse.CreateResponse(ResponseCodes.ErrorException,ex.Message,"null"));
+            }
+            
+        }
+        [Authorize(EshopPermissions.ManagerPermissions.Get)]
         [HttpGet("get-all-roles")]
         public IActionResult GetRoles()
         {

@@ -124,7 +124,7 @@ namespace eshop_pbl6.Controllers.Identities
                 var handler = new JwtSecurityTokenHandler();
                 var jwtSecurityToken = handler.ReadJwtToken(token);
                 string username = jwtSecurityToken.Claims.FirstOrDefault(claim => claim.Type == "nameid").Value;
-                if (await _userService.ChangePassworrd(username, passwordOld, passwordNew) == true)
+                if (await _userService.ChangePassword(username, passwordOld, passwordNew) == true)
                 {
                     return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "Thay đổi mật khẩu thành công", true));
                 }
