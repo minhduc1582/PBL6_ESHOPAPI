@@ -1,4 +1,5 @@
 ﻿using eshop_api.Controllers;
+using eshop_api.Helpers;
 using Eshop_API.Models.DTO.Comments;
 using Eshop_API.Services.Comments;
 using eshop_pbl6.Helpers.Common;
@@ -47,7 +48,7 @@ namespace Eshop_API.Controllers.Comments
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.ErrorException, ex.Message, "null"));
             }
         }
-        [HttpPut("Edit Comment")]
+        [HttpPut("edit-comment")]
         public async Task<IActionResult> EditComment(CreateUpdateComment createUpdateComment, int idComment)
         {
             try
@@ -65,7 +66,12 @@ namespace Eshop_API.Controllers.Comments
         {
             try
             {
-                var result = await _commentService.DeleteComment(idComment);
+                var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                var handler = new JwtSecurityTokenHandler();
+                var jwtSecurityToken = handler.ReadJwtToken(token);
+                string idUser = jwtSecurityToken.Claims.First(claim => claim.Type == "Id").Value;
+                var result = await _commentService.DeleteComment(idComment, int.Parse(idUser));
+                if(result == false) return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "không thể xóa dữ liệu", result));
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok, "lấy dữ liệu thành công", result));
             }
             catch (Exception ex)

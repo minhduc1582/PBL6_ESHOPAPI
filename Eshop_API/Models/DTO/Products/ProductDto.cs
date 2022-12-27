@@ -16,6 +16,7 @@ namespace eshop_api.Models.DTO.Products
         public string AvtImageUrl{get;set;}
         public double Price{get;set;}
         public double Discount{get;set;}
+        public int? ImportQuantity{get;set;}
         public float Weight{get;set;}
         public string DetailProduct{get;set;}
         public string Description{get;set;}

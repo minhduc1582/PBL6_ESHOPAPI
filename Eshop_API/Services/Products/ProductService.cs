@@ -120,10 +120,13 @@ namespace eshop_api.Service.Products
                         products = products.OrderByDescending(x => x.Id).ToList();
                         break;
                     case 2:
-                        products = products.OrderByDescending(x => x.ExportQuantity).ToList();
+                        products = products.OrderBy(x => x.Id).ToList();
                         break;
                     case 3:
                         products = products.OrderBy(x => x.Price).ToList();
+                        break;
+                    case 4:
+                        products = products.OrderByDescending(x => x.Price).ToList();
                         break;
                 }
             }

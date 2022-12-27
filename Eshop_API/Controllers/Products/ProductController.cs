@@ -62,7 +62,7 @@ namespace eshop_api.Controllers.Products
             try{
                 var result = await _productService.GetProductsByIdCategory(idCategory, sortOrder);
                 result = result.Where(x => input.Filter == "" || input.Filter == null || x.Name.ToLower().Contains(input.Filter.ToLower())).ToList();
-                var page_list  = PagedList<ProductDto>.ToPagedList(result.OrderBy(on => on.Name),
+                var page_list  = PagedList<ProductDto>.ToPagedList(result,
                         input.PageNumber,
                         input.PageSize);
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,"get dữ liệu thành công",page_list) );

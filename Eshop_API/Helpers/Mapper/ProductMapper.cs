@@ -22,6 +22,7 @@ namespace eshop_api.Helpers.Mapper
             productDto.Weight = product.Weight;
             productDto.Description = product.Description;
             productDto.DetailProduct = product.DetailProduct;
+            productDto.ImportQuantity = product.ImportQuantity;
             productDto.Color = product.Color;
             return productDto;
         }

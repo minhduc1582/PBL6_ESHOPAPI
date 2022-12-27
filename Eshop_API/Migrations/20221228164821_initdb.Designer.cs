@@ -8,11 +8,11 @@ using eshop_api.Helpers;
 
 #nullable disable
 
-namespace eshop_api.Migrations
+namespace Eshop_API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221128144750_AddTableAddress")]
-    partial class AddTableAddress
+    [Migration("20221228164821_initdb")]
+    partial class initdb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -64,6 +64,34 @@ namespace eshop_api.Migrations
                     b.ToTable("Addresses");
                 });
 
+            modelBuilder.Entity("eshop_api.Entities.BillPay", b =>
+                {
+                    b.Property<Guid>("TnxRef")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Amount")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("BankCode")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("OrderInfo")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("PayDate")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TransactionNo")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("TnxRef");
+
+                    b.ToTable("BillPays");
+                });
+
             modelBuilder.Entity("eshop_api.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -78,6 +106,9 @@ namespace eshop_api.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<int?>("ParentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("level")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -212,15 +243,15 @@ namespace eshop_api.Migrations
 
             modelBuilder.Entity("eshop_api.Entities.Order", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<int?>("AddressId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Check")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("CheckedAt")
-                        .HasColumnType("longtext");
+                    b.Property<DateTime>("CheckedAt")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("CheckedBy")
                         .HasColumnType("longtext");
@@ -228,8 +259,17 @@ namespace eshop_api.Migrations
                     b.Property<string>("CheckedComment")
                         .HasColumnType("longtext");
 
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("DeliveryTime")
+                        .HasColumnType("int");
+
                     b.Property<string>("Note")
                         .HasColumnType("longtext");
+
+                    b.Property<int>("PaymentMethod")
+                        .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .HasColumnType("longtext");
@@ -241,6 +281,8 @@ namespace eshop_api.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AddressId");
 
                     b.HasIndex("UserId");
 
@@ -256,8 +298,8 @@ namespace eshop_api.Migrations
                     b.Property<string>("Note")
                         .HasColumnType("longtext");
 
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("OrderId")
+                        .HasColumnType("char(36)");
 
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -296,10 +338,9 @@ namespace eshop_api.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Detail")
+                    b.Property<string>("DetailProduct")
                         .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("varchar(4000)");
+                        .HasColumnType("longtext");
 
                     b.Property<double?>("Discount")
                         .HasColumnType("double");
@@ -371,20 +412,11 @@ namespace eshop_api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<string>("Address1")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Address2")
-                        .HasColumnType("longtext");
-
                     b.Property<string>("AvatarUrl")
                         .HasColumnType("longtext");
 
                     b.Property<DateTime>("BirthDay")
                         .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Code")
-                        .HasColumnType("longtext");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -394,7 +426,7 @@ namespace eshop_api.Migrations
                     b.Property<string>("FirstName")
                         .HasColumnType("longtext");
 
-                    b.Property<int>("Gender")
+                    b.Property<int?>("Gender")
                         .HasColumnType("int");
 
                     b.Property<string>("LastName")
@@ -406,10 +438,7 @@ namespace eshop_api.Migrations
                     b.Property<byte[]>("PasswordSalt")
                         .HasColumnType("longblob");
 
-                    b.Property<string>("Phone1")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Phone2")
+                    b.Property<string>("Phone")
                         .HasColumnType("longtext");
 
                     b.Property<int>("RoleId")
@@ -425,6 +454,22 @@ namespace eshop_api.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AppUsers");
+                });
+
+            modelBuilder.Entity("Eshop_API.Entities.Vote", b =>
+                {
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<float>("Star")
+                        .HasColumnType("float");
+
+                    b.HasKey("ProductId", "UserId");
+
+                    b.ToTable("Votes");
                 });
 
             modelBuilder.Entity("eshop_pbl6.Entities.Permission", b =>
@@ -487,6 +532,17 @@ namespace eshop_api.Migrations
                     b.Navigation("province");
 
                     b.Navigation("user");
+                });
+
+            modelBuilder.Entity("eshop_api.Entities.BillPay", b =>
+                {
+                    b.HasOne("eshop_api.Entities.Order", "Order")
+                        .WithOne("BillPay")
+                        .HasForeignKey("eshop_api.Entities.BillPay", "TnxRef")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("eshop_api.Entities.Comment", b =>
@@ -554,11 +610,17 @@ namespace eshop_api.Migrations
 
             modelBuilder.Entity("eshop_api.Entities.Order", b =>
                 {
+                    b.HasOne("Eshop_API.Entities.Address", "Address")
+                        .WithMany()
+                        .HasForeignKey("AddressId");
+
                     b.HasOne("eshop_api.Entities.User", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Address");
 
                     b.Navigation("User");
                 });
@@ -629,6 +691,11 @@ namespace eshop_api.Migrations
             modelBuilder.Entity("eshop_api.Entities.District", b =>
                 {
                     b.Navigation("Comunities");
+                });
+
+            modelBuilder.Entity("eshop_api.Entities.Order", b =>
+                {
+                    b.Navigation("BillPay");
                 });
 
             modelBuilder.Entity("eshop_api.Entities.Product", b =>
