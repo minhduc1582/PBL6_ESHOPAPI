@@ -1,4 +1,5 @@
-﻿using eshop_api.Entities;
+﻿using AutoMapper;
+using eshop_api.Entities;
 using eshop_api.Helpers;
 using Eshop_API.Models.DTO.Comments;
 
@@ -7,9 +8,11 @@ namespace Eshop_API.Services.Comments
     public class CommentService : ICommentService
     {
         private readonly DataContext _context;
-        public CommentService(DataContext context)
+        private readonly IMapper _mapper;
+        public CommentService(DataContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         public async Task<Comment> AddComment(CreateUpdateComment createUpdateComment, int userId)
@@ -23,11 +26,12 @@ namespace Eshop_API.Services.Comments
             return comment;
         }
 
-        public async Task<bool> DeleteComment(int idComment)
+        public async Task<bool> DeleteComment(int idComment, int idUser)
         {
             var comment = _context.Comments.FirstOrDefault(x => x.Id == idComment);
             if(comment!=null)
             {
+                if (idUser != comment.UserId) return false;
                 var result = _context.Remove(comment);
                 await _context.SaveChangesAsync();
                 return true;
@@ -49,9 +53,18 @@ namespace Eshop_API.Services.Comments
             return comments;
         }
 
-        public async Task<List<Comment>> GetProductComment(int idProduct)
+        public async Task<List<CommentDto>> GetProductComment(int idProduct)
         {
-            return _context.Comments.Where(x => x.ProductId == idProduct).ToList();
+            var comments = _context.Comments.Where(x => x.ProductId == idProduct).ToList();
+            List<CommentDto> list = new List<CommentDto>();
+            foreach(var i in comments)
+            {
+                CommentDto comment = _mapper.Map<Comment, CommentDto>(i);
+                string firstName = _context.AppUsers.FirstOrDefault(x => x.Id == i.UserId).FirstName.ToString();
+                comment.Username = firstName;
+                list.Add(comment);
+            }    
+            return list;
         }
     }
 }
