@@ -13,7 +13,7 @@ pipeline{
         stage('Checkout') {
             steps {
                 git branch: 'Developer',
-                    url: 'https://github.com/minhduc1582/SLN_API_PBL6.git'
+                    url: 'git@github.com:minhduc1582/SLN_API_PBL6.git'
             }
         }
 
