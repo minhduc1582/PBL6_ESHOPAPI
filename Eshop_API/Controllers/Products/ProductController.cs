@@ -86,6 +86,20 @@ namespace eshop_api.Controllers.Products
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,ex.Message,"null") );
             }
         }
+        [HttpGet("get-detail-by-product-id")]
+        public async Task<ActionResult> GetDetailByProductId([FromQuery]PagedAndSortedResultRequestDto input, int idProduct, int idSize)
+        {
+            try{
+                var result = await _productService.GetDetailByProductId(idProduct, idSize);
+                var page_list  = PagedList<ProductDetail>.ToPagedList(result,
+                        input.PageNumber,
+                        input.PageSize);
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,"get dữ liệu thành công",page_list) );
+            }
+            catch(Exception ex){
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,ex.Message,"null") );
+            }
+        }
         [HttpGet("get-list-product-by-name")]
         public async Task<ActionResult>  GetListProductByName([FromQuery]PagedAndSortedResultRequestDto input, string productName,int sortOrder){
             try{

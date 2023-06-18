@@ -421,5 +421,11 @@ namespace eshop_api.Service.Products
             }
             return await Task.FromResult(productDtos);
         }
+
+        public async Task<List<ProductDetail>> GetDetailByProductId(int idProduct, int idSize)
+        {
+            var detail = await _productDetailRepository.Find(x => x.ProductId == idProduct && x.SizeId == idSize);
+            return detail.ToList();
+        }
     }
 }
