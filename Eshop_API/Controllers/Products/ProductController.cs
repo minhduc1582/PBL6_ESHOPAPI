@@ -72,29 +72,22 @@ namespace eshop_api.Controllers.Products
             }
         }
         [HttpGet("get-list-product-by-type")]
-        public async Task<ActionResult> GetListProductByType([FromQuery]PagedAndSortedResultRequestDto input, int type)
+        public async Task<ActionResult> GetListProductByType( int type)
         {
             try{
                 var result = await _productService.GetListProductsByType(type);
-                result = result.Where(x => input.Filter == "" || input.Filter == null || x.Name.ToLower().Contains(input.Filter.ToLower())).ToList();
-                var page_list  = PagedList<ProductDto>.ToPagedList(result,
-                        input.PageNumber,
-                        input.PageSize);
-                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,"get dữ liệu thành công",page_list) );
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,"get dữ liệu thành công",result) );
             }
             catch(Exception ex){
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,ex.Message,"null") );
             }
         }
         [HttpGet("get-detail-by-product-id")]
-        public async Task<ActionResult> GetDetailByProductId([FromQuery]PagedAndSortedResultRequestDto input, int idProduct, int idSize)
+        public async Task<ActionResult> GetDetailByProductId( int idProduct, int idSize)
         {
             try{
                 var result = await _productService.GetDetailByProductId(idProduct, idSize);
-                var page_list  = PagedList<ProductDetail>.ToPagedList(result,
-                        input.PageNumber,
-                        input.PageSize);
-                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,"get dữ liệu thành công",page_list) );
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,"get dữ liệu thành công",result) );
             }
             catch(Exception ex){
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,ex.Message,"null") );

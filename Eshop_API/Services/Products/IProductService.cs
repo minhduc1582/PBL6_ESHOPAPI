@@ -19,6 +19,6 @@ namespace eshop_api.Service.Products
         Task<ProductDto> GetProductById(int IdProduct);
         Task<List<List<Product>>> GetBestSeller();
         Task<List<ProductDto>> GetListProductsByType(int type);
-        Task<List<ProductDetail>> GetDetailByProductId(int idProduct, int idSize);
+        Task<ProductDetail> GetDetailByProductId(int idProduct, int idSize);
     }
 }

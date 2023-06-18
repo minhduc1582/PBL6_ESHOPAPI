@@ -390,7 +390,7 @@ namespace eshop_api.Service.Products
                     clothes_type = "shoe";
                     break;
                 case 4:
-                    clothes_type = "hat";
+                    clothes_type = "glass";
                     break;
             }
             var catergories = await _categoryRepository.Find(x => x.Code == clothes_type);
@@ -422,10 +422,10 @@ namespace eshop_api.Service.Products
             return await Task.FromResult(productDtos);
         }
 
-        public async Task<List<ProductDetail>> GetDetailByProductId(int idProduct, int idSize)
+        public async Task<ProductDetail> GetDetailByProductId(int idProduct, int idSize)
         {
-            var detail = await _productDetailRepository.Find(x => x.ProductId == idProduct && x.SizeId == idSize);
-            return detail.ToList();
+            var detail = await _productDetailRepository.FirstOrDefault(x => x.ProductId == idProduct && x.SizeId == idSize);
+            return detail;
         }
     }
 }
