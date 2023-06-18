@@ -20,15 +20,18 @@ namespace eshop_api.Service.Products
         private readonly IImageRepository _imageRepository;
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
+        private readonly IProductDetailRepository _productDetailRepository;
         public ProductService(IImageRepository imageRepository, 
                             IImageService imageService,
                             IProductRepository productRepository,
-                            ICategoryRepository categoryRepository)
+                            ICategoryRepository categoryRepository,
+                            IProductDetailRepository productDetailRepository)
         {
             _imageService = imageService;
             _imageRepository = imageRepository;
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;  
+            _productDetailRepository = productDetailRepository;
         }
 
         public async Task<ProductDto> AddProduct(CreateUpdateProductDto createProductDto)
@@ -368,6 +371,55 @@ namespace eshop_api.Service.Products
                 throw ex;
             }
 
+        }
+
+        public async Task<List<ProductDto>> GetListProductsByType(int type)
+        {
+            List<Product> products = new List<Product>();
+            string clothes_type = "";
+            bool add = false;
+            switch (type)
+            {
+                case 1:
+                    clothes_type = "top";
+                    break;
+                case 2:
+                    clothes_type = "bottom";
+                    break;
+                case 3:
+                    clothes_type = "shoe";
+                    break;
+                case 4:
+                    clothes_type = "hat";
+                    break;
+            }
+            var catergories = await _categoryRepository.Find(x => x.Code == clothes_type);
+            foreach(var cate in catergories)
+            {
+                List<Product> find_product = await _productRepository.Find(x => x.CategoryId == cate.Id);
+                foreach(Product product in find_product)
+                {
+                    List<ProductDetail> productDetails = await _productDetailRepository.Find(x => x.ProductId == product.Id);
+                    foreach(ProductDetail i in productDetails)
+                    {
+                        if(!string.IsNullOrEmpty(i.Object3D)) add = true;
+                    }
+                    if(add == true)
+                    {
+                         products.Add(product);
+                        add = false;
+                    }
+                }
+            }
+            var imgaes = await _imageRepository.GetAll();
+            List<ProductDto> productDtos = new List<ProductDto>();
+            foreach (var item in products)
+            {
+                ProductDto productDto = ProductMapper.toProductDto(item);
+                productDto.ImageUrl = imgaes.Where(x => x.ProductID == item.Id).Select(x => x.Url).ToList();
+                productDtos.Add(productDto);
+            }
+            return await Task.FromResult(productDtos);
         }
     }
 }

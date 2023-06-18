@@ -40,5 +40,6 @@ namespace eshop_api.Helpers
         public DbSet<History> Histories{get;set;}
         public DbSet<BillPay> BillPays{get;set;}
         public DbSet<Vote> Votes{get;set;}
+        public DbSet<ProductDetail> ProductDetails { get; set;}
     }
 }

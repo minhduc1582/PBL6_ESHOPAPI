@@ -153,6 +153,8 @@ services.AddTransient<IImageRepository, ImageRepository>();
 services.AddTransient<IOrderDetailRepository, OrderDetailRepository>();
 services.AddTransient<ICategoryRepository, CategoryRepository>();
 services.AddTransient<IProductRepository, ProductRepository>();
+services.AddTransient<IProductDetailRepository, ProductDetailRepository>();
+
 #endregion
 services.AddControllers()
            .AddJsonOptions(options =>

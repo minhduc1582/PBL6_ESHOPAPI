@@ -71,6 +71,21 @@ namespace eshop_api.Controllers.Products
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,ex.Message,"null") );
             }
         }
+        [HttpGet("get-list-product-by-type")]
+        public async Task<ActionResult> GetListProductByType([FromQuery]PagedAndSortedResultRequestDto input, int type)
+        {
+            try{
+                var result = await _productService.GetListProductsByType(type);
+                result = result.Where(x => input.Filter == "" || input.Filter == null || x.Name.ToLower().Contains(input.Filter.ToLower())).ToList();
+                var page_list  = PagedList<ProductDto>.ToPagedList(result,
+                        input.PageNumber,
+                        input.PageSize);
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,"get dữ liệu thành công",page_list) );
+            }
+            catch(Exception ex){
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,ex.Message,"null") );
+            }
+        }
         [HttpGet("get-list-product-by-name")]
         public async Task<ActionResult>  GetListProductByName([FromQuery]PagedAndSortedResultRequestDto input, string productName,int sortOrder){
             try{
@@ -190,5 +205,6 @@ namespace eshop_api.Controllers.Products
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,ex.Message,"null") );
             }
         }
+        
     }
 }
