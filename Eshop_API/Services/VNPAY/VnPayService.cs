@@ -87,6 +87,7 @@ namespace Eshop_API.Services.VNPAY
                     result = new  {RspCode = "04", Message="invalid amount"};
                 }
                 await _billPaymentRepository.Add(billPay);
+                await _billPaymentRepository.SaveChangesAsync();
             }
             else
             {

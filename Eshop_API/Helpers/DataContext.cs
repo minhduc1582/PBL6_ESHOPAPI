@@ -41,5 +41,7 @@ namespace eshop_api.Helpers
         public DbSet<BillPay> BillPays{get;set;}
         public DbSet<Vote> Votes{get;set;}
         public DbSet<ProductDetail> ProductDetails { get; set;}
+        public DbSet<Colors> Colors { get; set;}
+        public DbSet<Sizes> Sizes { get; set;}
     }
 }

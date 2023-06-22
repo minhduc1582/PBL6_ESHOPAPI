@@ -18,7 +18,7 @@ namespace eshop_api.Service.Products
         Task<bool> DeleteProductById(int id);
         Task<ProductDto> GetProductById(int IdProduct);
         Task<List<List<Product>>> GetBestSeller();
-        Task<List<ProductDto>> GetListProductsByType(int type);
+        Task<List<ProductDto>> GetListProductsByType(int type,int gender);
         Task<ProductDetail> GetDetailByProductId(int idProduct, int idSize);
     }
 }

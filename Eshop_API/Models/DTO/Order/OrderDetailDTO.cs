@@ -13,6 +13,9 @@ namespace eshop_api.Models.DTO.Order
         [Required(ErrorMessage = "Quantity không được bỏ trống")]
         [Range(1,1000000,ErrorMessage = "Số lượng sản phẩm từ 1 đến 1000000")]
         public int Quantity{get;set;}
+
         public string Note{get;set;}
+        public int SizeId{get;set;}
+        public int ColorId{get;set;}
     }
 }

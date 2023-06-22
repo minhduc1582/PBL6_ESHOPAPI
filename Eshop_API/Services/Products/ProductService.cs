@@ -186,11 +186,11 @@ namespace eshop_api.Service.Products
             var bestSeller = new List<List<Product>>();
             var laptop = await _productRepository.GetAll();
             var categories = await _categoryRepository.GetAll();
-            var categoriesLaptop = categories.Where(x=> x.Code.StartsWith("LT"));
-            var categoriesPC = categories.Where(x => x.Code.StartsWith("PC"));
-            var categoriesMH = categories.Where(x => x.Code.StartsWith("MH"));
-            var categoriesGear = categories.Where(x => x.Code.StartsWith("GMGR"));
-            var bestLaptop = laptop.Join(categoriesLaptop, x => x.CategoryId, y => y.Id, (x, y) => new Product
+            var categoriesMale = categories.Where(x=> x.ParentId == 1);
+            var categoriesPC = categories.Where(x => x.ParentId == 2);
+            // var categoriesMH = categories.Where(x => x.Code.StartsWith("MH"));
+            // var categoriesGear = categories.Where(x => x.Code.StartsWith("GMGR"));
+            var bestLaptop = laptop.Join(categoriesMale, x => x.CategoryId, y => y.Id, (x, y) => new Product
             {
                 Id = x.Id,
                 Code = x.Code,
@@ -228,44 +228,6 @@ namespace eshop_api.Service.Products
                 DetailProduct = x.DetailProduct,
                 CategoryId = x.CategoryId
             }).OrderByDescending(x => x.ExportQuantity).Take(8).ToList();
-            var bestScreen = laptop.Join(categoriesMH, x => x.CategoryId, y => y.Id, (x, y) => new Product
-            {
-                Id = x.Id,
-                Code = x.Code,
-                Status = x.Status,
-                Name = x.Name,
-                Keyword = x.Keyword,
-                AvtImageUrl = x.AvtImageUrl,
-                Price = x.Price,
-                Discount = x.Discount,
-                ExportQuantity = x.ExportQuantity,
-                ImportQuantity = x.ImportQuantity,
-                Weight = x.Weight,
-                Description = x.Description,
-                Color = x.Color,
-                IsDelete = x.IsDelete,
-                DetailProduct = x.DetailProduct,
-                CategoryId = x.CategoryId
-            }).OrderByDescending(x => x.ExportQuantity).Take(8).ToList();
-            var bestGear = laptop.Join(categoriesGear, x => x.CategoryId, y => y.Id, (x, y) => new Product
-            {
-                Id = x.Id,
-                Code = x.Code,
-                Status = x.Status,
-                Name = x.Name,
-                Keyword = x.Keyword,
-                AvtImageUrl = x.AvtImageUrl,
-                Price = x.Price,
-                Discount = x.Discount,
-                ExportQuantity = x.ExportQuantity,
-                ImportQuantity = x.ImportQuantity,
-                Weight = x.Weight,
-                Description = x.Description,
-                Color = x.Color,
-                IsDelete = x.IsDelete,
-                DetailProduct = x.DetailProduct,
-                CategoryId = x.CategoryId
-            }).OrderByDescending(x => x.ExportQuantity).Take(8).ToList();
 
             //var bestLaptop = await _productRepository.Find(x => x.CategoryId == 1);
             //bestLaptop = bestLaptop.Where().OrderByDescending(x => x.ExportQuantity).ToList();
@@ -283,10 +245,10 @@ namespace eshop_api.Service.Products
             bestSeller[1].AddRange(bestPC);
             bestSeller.Add(new List<Product>());
             //foreach (var i in bestScreen) bestSeller[2].Add(i);
-            bestSeller[2].AddRange(bestScreen);
+            //bestSeller[2].AddRange(new List<object>());
             bestSeller.Add(new List<Product>());
             //foreach (var i in bestGear) bestSeller[3].Add(i);
-            bestSeller[3].AddRange(bestGear);
+            //bestSeller[3].AddRange(bestGear);
 
             return bestSeller;
         }
@@ -373,7 +335,7 @@ namespace eshop_api.Service.Products
 
         }
 
-        public async Task<List<ProductDto>> GetListProductsByType(int type)
+        public async Task<List<ProductDto>> GetListProductsByType(int type, int gender)
         {
             List<Product> products = new List<Product>();
             string clothes_type = "";
@@ -393,7 +355,8 @@ namespace eshop_api.Service.Products
                     clothes_type = "glass";
                     break;
             }
-            var catergories = await _categoryRepository.Find(x => x.Code == clothes_type);
+            gender = gender == 0 ? 2 : 1;
+            var catergories = await _categoryRepository.Find(x => x.Code == clothes_type && x.ParentId == gender);
             foreach(var cate in catergories)
             {
                 List<Product> find_product = await _productRepository.Find(x => x.CategoryId == cate.Id);

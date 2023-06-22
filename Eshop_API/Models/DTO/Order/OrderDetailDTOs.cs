@@ -18,5 +18,8 @@ namespace eshop_api.Models.DTO.Order
         public int Quantity{get;set;}
         public string Note{get;set;}
 
+        public int SizeId{get;set;}
+        public int ColorId{get;set;}
+
     }
 }

@@ -140,6 +140,7 @@ services.AddTransient<IOderDetailService, OderDetailService>();
 services.AddTransient<ICommentService, CommentService>();
 services.AddTransient<IAddressService, AddressService>();
 services.AddTransient<IVnPayService, VnPayService>();
+services.AddTransient<ISizeColorService, SizeColorService>();
 services.AddAutoMapper(typeof(MapperProfiles).Assembly);
 #endregion
 

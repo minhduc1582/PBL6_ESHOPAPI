@@ -35,6 +35,7 @@ namespace eshop_api.Entities
         public string AvatarUrl { get; set; }
         public DateTime BirthDay { get; set; }
         public GenderEnum? Gender { get; set; }
+        public DateTime CreatedAt{get;set;} = DateTime.Now;
         [ForeignKey("Role")]
         public int RoleId{get;set;}
         [JsonIgnore]

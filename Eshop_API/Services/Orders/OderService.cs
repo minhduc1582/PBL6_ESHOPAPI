@@ -154,12 +154,12 @@ namespace eshop_api.Services.Orders
             List<Order> orders = await GetOrdersByUserId(userId);
             foreach(Order i in orders)
             {
-                if(i.Status == "Cart")
+                if(i.Status == "Cart" )
                 {
                     var orderDetails = await _orderDetailService.GetOrderDetailByOrderId(i.Id);
                     foreach(OrderDetailDTOs j in orderDetails)
                     {
-                        if(j.ProductId == detailDTOs.ProductId)
+                        if(j.ProductId == detailDTOs.ProductId && j.SizeId == detailDTOs.SizeId && j.ColorId == detailDTOs.ColorId)
                         {
                             isExist = true;
                             j.Quantity += detailDTOs.Quantity;

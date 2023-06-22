@@ -22,6 +22,8 @@ namespace eshop_api.Helpers.Mapper
             orderDetailDTOs.Price = product.Price;
             orderDetailDTOs.Quantity = orderDetail.Quantity;
             orderDetailDTOs.Note = orderDetail.Note;
+            orderDetailDTOs.ColorId = orderDetail.ColorId;
+            orderDetailDTOs.SizeId = orderDetail.SizeId;
             return orderDetailDTOs;
         }
     }

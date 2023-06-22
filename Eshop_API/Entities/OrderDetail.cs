@@ -16,6 +16,10 @@ namespace eshop_api.Entities
         public int ProductId{get;set;}
         public int Quantity{get;set;}
         public string Note{get;set;}
+        [ForeignKey("Sizes")]
+        public int SizeId{get;set;}
+        [ForeignKey("Colors")]
+        public int ColorId{get;set;}
         public virtual Order Order{get;set;}
         public virtual Product Product{get;set;}
 

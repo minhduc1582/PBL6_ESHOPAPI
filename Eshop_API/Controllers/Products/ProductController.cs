@@ -24,16 +24,18 @@ namespace eshop_api.Controllers.Products
         ILogger<ProductController> _logger;
         private readonly IHub _sentryHub;
         //private readonly IElasticClient _elasticClient;
-        public ProductController(DataContext context,
-                                IProductService productService,
+        private readonly ISizeColorService _sizeColorService;
+        public ProductController(IProductService productService,
                                 IHubContext <MessageHub,IMessageHubClient> messageHub,
                                 ILogger<ProductController> logger,
-                                IHub sentryHub)
+                                IHub sentryHub,
+                                ISizeColorService sizeColorService)
         {
             _productService = productService;
             _messageHub = messageHub;
             _logger = logger;
             _sentryHub = sentryHub;
+            _sizeColorService = sizeColorService;
         }
         [HttpGet("get-list-product")]
         [Authorize(EshopPermissions.ProductPermissions.GetList)]
@@ -72,10 +74,10 @@ namespace eshop_api.Controllers.Products
             }
         }
         [HttpGet("get-list-product-by-type")]
-        public async Task<ActionResult> GetListProductByType( int type)
+        public async Task<ActionResult> GetListProductByType( int type,int gender)
         {
             try{
-                var result = await _productService.GetListProductsByType(type);
+                var result = await _productService.GetListProductsByType(type, gender);
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,"get dữ liệu thành công",result) );
             }
             catch(Exception ex){
@@ -110,7 +112,7 @@ namespace eshop_api.Controllers.Products
         [HttpGet("find-product")]
         public async Task<ActionResult>  FindProduct([FromQuery]PagedAndSortedResultRequestDto input, string productName, int stockfirst, int stocklast, int idCategory, int idProduct){
             try{
-                var result = await _productService.FindProduct(productName,stockfirst,stocklast,idCategory, idProduct);
+                var result = (await _productService.FindProduct(productName,stockfirst,stocklast,idCategory, idProduct));
                 result.Where(x => input.Filter == "" || input.Filter == null || x.Name == input.Filter);
                 var page_list = PagedList<ProductDto>.ToPagedList(result.OrderBy(on => on.Name),
                         input.PageNumber,
@@ -212,6 +214,23 @@ namespace eshop_api.Controllers.Products
                 return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,ex.Message,"null") );
             }
         }
-        
+        [HttpGet("get-list-color")]
+        public async Task<ActionResult> GetColors(){
+            try{
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,"Lấy dữ liệu thành công",await _sizeColorService.GetAllColors()));
+            }
+            catch(Exception ex){
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.ErrorException,ex.Message,"null") );
+            }
+        }
+        [HttpGet("get-list-size")]
+        public async Task<ActionResult> GetSizes(){
+            try{
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.Ok,"Lấy dữ liệu thành công",await _sizeColorService.GetAllSizes()));
+            }
+            catch(Exception ex){
+                return Ok(CommonReponse.CreateResponse(ResponseCodes.ErrorException,ex.Message,"null") );
+            }
+        }
     }
 }

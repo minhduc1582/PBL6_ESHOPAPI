@@ -17,13 +17,16 @@ namespace eshop_api.Services.Orders
         private readonly IOrderDetailRepository _orderDetailRepository;
         private readonly IOrderRepository _orderRepository;
         private readonly IProductRepository _productRepository;
+        private readonly DataContext _context;
         public OderDetailService(IOrderDetailRepository orderDetailRepository,
                                 IOrderRepository orderRepository,
-                                IProductRepository productRepository)
+                                IProductRepository productRepository,
+                                DataContext context)
         {
             _orderDetailRepository = orderDetailRepository;
             _orderRepository = orderRepository;
             _productRepository = productRepository;
+            _context = context;
         }
         public async Task<OrderDetail> AddOrderDetail(CreateUpdateOrderDetail createUpdateOrderDetail)
         {
@@ -45,6 +48,8 @@ namespace eshop_api.Services.Orders
             orderDetail.ProductId = orderDetailDTO.ProductId;
             orderDetail.Quantity = orderDetailDTO.Quantity;
             orderDetail.Note = orderDetailDTO.Note;
+            orderDetail.ColorId = orderDetailDTO.ColorId;
+            orderDetail.SizeId = orderDetailDTO.SizeId;
             var result = await _orderDetailRepository.Add(orderDetail);
             await _orderDetailRepository.SaveChangesAsync();
             return result;
@@ -91,8 +96,14 @@ namespace eshop_api.Services.Orders
                 foreach(OrderDetail i in orderDetail)
                 {
                     var product = await _productRepository.FirstOrDefault(x => x.Id == i.ProductId);
-                    OrderDetailDTOs orderDetailDTOs = OrderDetailMapper.toOrderDetailDto(i, product);
-                    list.Add(orderDetailDTOs);
+                    if(product != null){
+                        string color = _context.Colors.FirstOrDefault(x => x.Id == i.ColorId)?.Color.ToString() ?? "Xanh";
+                        string size = _context.Sizes.FirstOrDefault(x => x.Id == i.SizeId)?.Size.ToString() ?? "S";
+                        product.Name += ", Size: "+ size +", Color: " + color;
+                        OrderDetailDTOs orderDetailDTOs = OrderDetailMapper.toOrderDetailDto(i, product);
+                        list.Add(orderDetailDTOs);
+                    }
+                    
                 }
                 return await Task.FromResult(list);
             }
